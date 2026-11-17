@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>شراء رقم — جمال سولوشنز</title>
+  <title>شراء رقم افتراضي | Rival Store</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
@@ -143,17 +143,68 @@
       background: #cbd5e1; border-radius: 3px;
     }
     .scroll-grid::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Rival Store — unified storefront identity. Cosmetic only: existing actions remain unchanged. */
+    :root { --rival:#8e2143; --rival-dark:#62142d; --rival-light:#fdf1f5; --rival-gold:#d7a75e; }
+    html,body { background:#f9f7f8; }
+    .hud-top {
+      background:linear-gradient(110deg,#10151f 0%,#271323 74%,#391728 100%);
+      border-bottom:1px solid rgba(215,167,94,.38);
+      box-shadow:0 6px 24px rgba(21,13,23,.16);
+    }
+    .rival-nav { display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+    .rival-brand {
+      width:116px; height:48px; display:flex; align-items:center; justify-content:center;
+      border-radius:14px; background:rgba(255,255,255,.06);
+      border:1px solid rgba(215,167,94,.26); padding:3px 9px;
+      margin-inline-end:8px; flex:0 0 auto; text-decoration:none;
+    }
+    .rival-brand img { width:100%; height:100%; object-fit:contain; display:block; }
+    .hud-chip { min-height:44px; border-radius:14px; padding:7px 12px;
+      border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.055);
+      box-shadow:0 2px 9px rgba(0,0,0,.07); font-size:12px;
+    }
+    .hud-chip .ico { width:32px; height:32px; border-radius:11px; }
+    .hud-chip:focus-visible,.rival-brand:focus-visible { outline:2px solid var(--rival-gold); outline-offset:3px; }
+    .hud-chip:hover { background:rgba(255,255,255,.12); transform:translateY(-2px); }
+    .hud-chip.buy .ico { color:#ffc7db; background:rgba(142,33,67,.35); border-color:rgba(225,122,162,.5); }
+    .hud-chip.buy:hover { border-color:#d77a9e; box-shadow:0 5px 18px rgba(142,33,67,.3); }
+    .hud-chip.voucher .ico { color:#e9bf79; background:rgba(215,167,94,.15); border-color:rgba(215,167,94,.43); }
+    .hud-chip.voucher:hover { border-color:var(--rival-gold); }
+    .hud-chip.verify .ico { color:#f1c878; background:rgba(225,174,77,.16); border-color:rgba(225,174,77,.45); }
+    .hud-chip.verify:hover { border-color:#f1c878; }
+    .main-area { padding-top:90px; }
+    .glass:focus { border-color:var(--rival); box-shadow:0 0 0 3px rgba(142,33,67,.12); }
+    .country-btn:hover,.service-btn:not(:disabled):hover { border-color:#d17b9b!important; background:var(--rival-light)!important; }
+    .country-btn.border-blue-500,.service-btn.border-blue-500 { border-color:var(--rival)!important; background:var(--rival-light)!important; }
+    #buy-btn:not(:disabled) { background:linear-gradient(120deg,var(--rival),var(--rival-dark)); box-shadow:0 5px 15px rgba(142,33,67,.18); }
+    #buy-btn:not(:disabled):hover { filter:brightness(1.08); }
+    button,a { -webkit-tap-highlight-color:transparent; }
+    @media(max-width:640px) {
+      .hud-top { padding:7px 9px; }
+      .rival-nav { flex-wrap:nowrap; gap:5px; justify-content:space-between; }
+      .rival-brand { width:76px; height:43px; padding:3px 5px; margin-inline-end:2px; border-radius:11px; }
+      .hud-chip { min-height:42px; padding:4px; border-radius:11px; }
+      .hud-chip .ico { width:31px; height:31px; border-radius:9px; }
+      .hud-chip .ico svg { width:19px; height:19px; }
+      .main-area { padding-top:72px; }
+    }
+    @media(max-width:375px) {
+      .rival-brand { width:65px; }
+      .rival-nav { gap:3px; }
+      .hud-chip .ico { width:29px; height:29px; }
+    }
   </style>
 </head>
 <body>
 
   <!-- ═══════════════ HUD TOP (4 أزرار) ═══════════════ -->
   <div class="hud-top">
-    <div class="max-w-5xl mx-auto flex items-center gap-2 flex-wrap">
+    <div class="max-w-5xl mx-auto rival-nav">
 
-      <div class="font-black text-sm tracking-tight bg-gradient-to-l from-sky-400 to-violet-400 bg-clip-text text-transparent mr-1">
-        JAMAL
-      </div>
+      <a class="rival-brand" href="https://rivalstore.xyz/" target="_blank" rel="noopener" aria-label="زيارة متجر رايفل ستور" title="Rival Store">
+        <img src="https://cdn.salla.sa/cdn-cgi/image/fit=scale-down,width=400,height=400,onerror=redirect,format=auto/vPmPa/O965fOLLasw8sjbrCIbHapWNbnXmEa9LkDJvGKeR.png" alt="Rival Store" loading="eager" referrerpolicy="no-referrer" />
+      </a>
 
       <!-- 💬 واتساب -->
       <a href="https://wa.me/966578405137" target="_blank" rel="noopener"
@@ -239,7 +290,7 @@
           </span>
         </div>
         <button type="button" onclick="refreshPrices(this)"
-                class="text-[11px] font-bold text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-400 bg-white px-3 py-1 rounded-lg transition-colors">
+                class="text-[11px] font-bold text-rose-800 hover:text-rose-900 border border-rose-200 hover:border-rose-400 bg-white px-3 py-1 rounded-lg transition-colors">
           🔄 تحديث البيانات
         </button>
       </div>
@@ -261,7 +312,7 @@
                   data-service-id="{{ p.service_id }}"
                   data-popular-index="{{ loop.index0 }}"
                   onclick="quickBuy('{{ p.country_slug }}', '{{ p.service_id }}')"
-                  class="group relative bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-blue-400 hover:shadow-md transition-all p-3 text-right overflow-hidden {% if loop.index > 6 %}hidden{% endif %}">
+                  class="group relative bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-rose-400 hover:shadow-md transition-all p-3 text-right overflow-hidden {% if loop.index > 6 %}hidden{% endif %}">
             <span class="absolute top-2 left-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
               {{ p.count }}+
             </span>
@@ -287,7 +338,7 @@
                   onclick="togglePopular(this)"
                   data-expanded="false"
                   data-preview="6"
-                  class="text-xs font-bold text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1">
+                  class="text-xs font-bold text-rose-800 hover:text-rose-900 border border-rose-200 hover:border-rose-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1">
             <span class="label">عرض المزيد ({{ popular_services|length - 6 }})</span>
             <svg class="w-3.5 h-3.5 transition-transform duration-200 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -325,7 +376,7 @@
                       data-slug="{{ c.slug }}"
                       data-code="{{ c.code }}"
                       data-country-index="{{ loop.index0 }}"
-                      class="country-btn flex items-center gap-2 p-3 rounded-xl border-2 border-slate-100 hover:border-blue-400 hover:bg-blue-50 transition-all text-right {% if loop.index > 6 %}hidden{% endif %}">
+                      class="country-btn flex items-center gap-2 p-3 rounded-xl border-2 border-slate-100 hover:border-rose-400 hover:bg-rose-50 transition-all text-right {% if loop.index > 6 %}hidden{% endif %}">
                 <span class="text-2xl">{{ c.flag }}</span>
                 <div class="flex-1 min-w-0">
                   <div class="text-sm font-bold text-slate-700 truncate">{{ c.name }}</div>
@@ -345,7 +396,7 @@
                       onclick="toggleMore(this, '.country-btn', 'countryIndex')"
                       data-expanded="false"
                       data-preview="6"
-                      class="text-xs font-bold text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1">
+                      class="text-xs font-bold text-rose-800 hover:text-rose-900 border border-rose-200 hover:border-rose-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1">
                 <span class="label">عرض المزيد ({{ countries|length - 6 }})</span>
                 <svg class="w-3.5 h-3.5 transition-transform duration-200 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -424,7 +475,7 @@
             </div>
 
             <button onclick="confirmPurchase()" id="buy-btn"
-                    class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                    class="w-full bg-rose-800 hover:bg-rose-900 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -438,7 +489,7 @@
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
             <h4 class="text-sm font-bold text-slate-800 mb-3">إحصائيات سريعة</h4>
             <div class="grid grid-cols-2 gap-3">
-              <div class="bg-blue-50 rounded-xl p-3 text-center">
+              <div class="bg-rose-50 rounded-xl p-3 text-center">
                 <div class="text-lg font-bold text-blue-600">{{ stats.total_orders }}</div>
                 <div class="text-[10px] text-slate-500">إجمالي الطلبات</div>
               </div>
@@ -556,7 +607,7 @@
       <div id="pr-cancelled" class="hidden">
         <p class="text-center text-sm text-slate-600 mb-3">تم إلغاء الطلب.</p>
         <button type="button" onclick="chooseAnotherNumber()"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm">
+                class="w-full bg-rose-800 hover:bg-rose-900 text-white font-bold py-2.5 rounded-xl text-sm">
           🔄 اختيار رقم آخر
         </button>
       </div>
@@ -785,7 +836,7 @@
       const btn = document.createElement('button');
       btn.type = 'button'; btn.dataset.id = s.id; btn.dataset.serviceIndex = idx;
       btn.className = 'service-btn flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-100 transition-all ' +
-        (s.available ? 'hover:border-blue-400 hover:bg-blue-50' : 'opacity-40 cursor-not-allowed');
+        (s.available ? 'hover:border-rose-400 hover:bg-rose-50' : 'opacity-40 cursor-not-allowed');
       if (idx >= PREVIEW_COUNT) btn.classList.add('hidden');
       if (s.available) btn.onclick = () => selectService(s.id, s.count, btn);
       else btn.disabled = true;
@@ -801,7 +852,7 @@
     });
     if (sorted.length > PREVIEW_COUNT) {
       moreWrap.classList.remove('hidden');
-      moreWrap.innerHTML = '<button type="button" onclick="toggleMore(this, \'.service-btn\', \'serviceIndex\')" data-expanded="false" data-preview="'+PREVIEW_COUNT+'" class="text-xs font-bold text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1"><span class="label">عرض المزيد ('+(sorted.length-PREVIEW_COUNT)+')</span><svg class="w-3.5 h-3.5 transition-transform duration-200 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>';
+      moreWrap.innerHTML = '<button type="button" onclick="toggleMore(this, \'.service-btn\', \'serviceIndex\')" data-expanded="false" data-preview="'+PREVIEW_COUNT+'" class="text-xs font-bold text-rose-800 hover:text-rose-900 border border-rose-200 hover:border-rose-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1"><span class="label">عرض المزيد ('+(sorted.length-PREVIEW_COUNT)+')</span><svg class="w-3.5 h-3.5 transition-transform duration-200 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>';
     }
   }
 
