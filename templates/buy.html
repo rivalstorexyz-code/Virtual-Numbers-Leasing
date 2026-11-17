@@ -144,6 +144,18 @@
     }
     .scroll-grid::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
+    /* قوائم الدول والبرامج مفتوحة بالكامل وقابلة للتمرير بدون زر عرض المزيد */
+    #country-grid, #service-grid {
+      max-height: 560px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    #country-more-wrap, #service-more-wrap { display: none !important; }
+    @media (max-width: 640px) {
+      #country-grid, #service-grid { max-height: 470px; }
+    }
+
     /* Rival Store: accessible navigation with visible labels at all sizes */
     :root { --rival:#951e32; --rival-dark:#641222; --rival-light:#fff3f4; --rival-gold:#e7bb74; }
     html,body { background:#faf8f8; }
@@ -391,7 +403,7 @@
                       data-slug="{{ c.slug }}"
                       data-code="{{ c.code }}"
                       data-country-index="{{ loop.index0 }}"
-                      class="country-btn flex items-center gap-2 p-3 rounded-xl border-2 border-slate-100 hover:border-rose-400 hover:bg-rose-50 transition-all text-right {% if loop.index > 6 %}hidden{% endif %}">
+                      class="country-btn flex items-center gap-2 p-3 rounded-xl border-2 border-slate-100 hover:border-rose-400 hover:bg-rose-50 transition-all text-right">
                 <span class="country-flag-slot" data-flag-code="{{ c.code }}" data-flag-value="{{ c.flag }}"><span class="country-flag-fallback">{{ c.flag }}</span></span>
                 <div class="flex-1 min-w-0">
                   <div class="text-sm font-bold text-slate-700 truncate">{{ c.name }}</div>
@@ -405,27 +417,15 @@
               لا توجد دولة مطابقة لبحثك
             </div>
 
-            {% if countries|length > 6 %}
-            <div class="text-center mt-3" id="country-more-wrap">
-              <button type="button"
-                      onclick="toggleMore(this, '.country-btn', 'countryIndex')"
-                      data-expanded="false"
-                      data-preview="6"
-                      class="text-xs font-bold text-rose-800 hover:text-rose-900 border border-rose-200 hover:border-rose-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1">
-                <span class="label">عرض المزيد ({{ countries|length - 6 }})</span>
-                <svg class="w-3.5 h-3.5 transition-transform duration-200 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-              </button>
-            </div>
-            {% endif %}
+
           </div>
 
           {# ══ الخطوة 2: الخدمة ══ #}
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 opacity-50 pointer-events-none" id="service-step">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-7 h-7 rounded-full bg-slate-300 text-white text-xs font-bold flex items-center justify-center">2</div>
-              <h3 class="text-base font-bold text-slate-800">اختر الخدمة</h3>
+              <h3 class="text-base font-bold text-slate-800">اختر البرنامج أو الخدمة</h3>
+              <span class="text-[11px] text-slate-400">تظهر البرامج المتوفرة بعد اختيار الدولة</span>
             </div>
 
             <div class="relative mb-3">
@@ -846,13 +846,12 @@
 
     if (!services || services.length === 0) { empty.classList.remove('hidden'); return; }
     empty.classList.add('hidden');
-    const sorted = sortByPopularity(services, s => s.id);
+    const sorted = sortByPopularity(services, s => s.id).sort((a, b) => Number(Boolean(b.available)) - Number(Boolean(a.available)));
     sorted.forEach((s, idx) => {
       const btn = document.createElement('button');
       btn.type = 'button'; btn.dataset.id = s.id; btn.dataset.serviceIndex = idx;
       btn.className = 'service-btn flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-100 transition-all ' +
         (s.available ? 'hover:border-rose-400 hover:bg-rose-50' : 'opacity-40 cursor-not-allowed');
-      if (idx >= PREVIEW_COUNT) btn.classList.add('hidden');
       if (s.available) btn.onclick = () => selectService(s.id, s.count, btn);
       else btn.disabled = true;
       const iconEl = document.createElement('div');
@@ -865,10 +864,7 @@
       btn.insertAdjacentHTML('beforeend', countHtml);
       grid.appendChild(btn);
     });
-    if (sorted.length > PREVIEW_COUNT) {
-      moreWrap.classList.remove('hidden');
-      moreWrap.innerHTML = '<button type="button" onclick="toggleMore(this, \'.service-btn\', \'serviceIndex\')" data-expanded="false" data-preview="'+PREVIEW_COUNT+'" class="text-xs font-bold text-rose-800 hover:text-rose-900 border border-rose-200 hover:border-rose-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1"><span class="label">عرض المزيد ('+(sorted.length-PREVIEW_COUNT)+')</span><svg class="w-3.5 h-3.5 transition-transform duration-200 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>';
-    }
+
   }
 
   function toggleMore(btn, selector, indexAttr) {
@@ -976,11 +972,8 @@
     const noRes = document.getElementById('country-no-results');
 
     if (!q) {
-      buttons.forEach(b => {
-        const i = parseInt(b.dataset.countryIndex, 10);
-        b.classList.toggle('hidden', !isNaN(i) && i >= PREVIEW_COUNT);
-      });
-      if (moreWrap) moreWrap.classList.remove('hidden');
+      buttons.forEach(b => b.classList.remove('hidden'));
+      if (moreWrap) moreWrap.classList.add('hidden');
       if (noRes) noRes.classList.add('hidden');
       return;
     }
@@ -996,7 +989,7 @@
     });
 
     if (moreWrap) moreWrap.classList.add('hidden');
-    if (noRes) noRes.classList.toggle('hidden', matched > 0);
+    if (noRes) noRes.classList.toggle('hidden', matched !== 0);
 
     const scroller = document.getElementById('country-grid');
     if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1011,11 +1004,8 @@
     const noRes = document.getElementById('service-no-results');
 
     if (!q) {
-      buttons.forEach(b => {
-        const i = parseInt(b.dataset.serviceIndex, 10);
-        b.classList.toggle('hidden', !isNaN(i) && i >= PREVIEW_COUNT);
-      });
-      if (moreWrap && buttons.length > PREVIEW_COUNT) moreWrap.classList.remove('hidden');
+      buttons.forEach(b => b.classList.remove('hidden'));
+      if (moreWrap) moreWrap.classList.add('hidden');
       if (noRes) noRes.classList.add('hidden');
       return;
     }
@@ -1030,7 +1020,7 @@
     });
 
     if (moreWrap) moreWrap.classList.add('hidden');
-    if (noRes) noRes.classList.toggle('hidden', matched > 0);
+    if (noRes) noRes.classList.toggle('hidden', matched !== 0);
 
     grid.scrollTo({ top: 0, behavior: 'smooth' });
   }
