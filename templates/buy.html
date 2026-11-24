@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>شراء رقم افتراضي | Rival Store</title>
+  <title>شراء رقم — جمال سولوشنز</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
@@ -40,7 +40,6 @@
     }
     .hud-chip:active { transform:translateY(0); }
 
-    /* 🔹 الأيقونة: مربع أكبر + SVG واضح + توهج */
     .hud-chip .ico {
       width:30px; height:30px;
       display:inline-flex; align-items:center; justify-content:center;
@@ -63,7 +62,6 @@
       display:block;
     }
 
-    /* ألوان مخصصة لكل زر */
     .hud-chip.whatsapp .ico { background:rgba(16,185,129,0.18); border-color:rgba(16,185,129,0.35); color:#34d399; }
     .hud-chip.whatsapp:hover { border-color:#34d399; box-shadow:0 4px 14px rgba(16,185,129,0.25); }
     .hud-chip.whatsapp:hover .ico { box-shadow:0 0 12px rgba(16,185,129,0.5); }
@@ -79,7 +77,6 @@
     .hud-chip.verify:hover { border-color:#fbbf24; box-shadow:0 4px 14px rgba(245,158,11,0.25); }
     .hud-chip.verify:hover .ico { box-shadow:0 0 12px rgba(245,158,11,0.5); }
 
-    /* إخفاء النص على الجوال مع بقاء الأيقونة واضحة */
     @media (max-width: 640px) {
       .hud-chip { padding:6px; gap:0; border-radius:11px; }
       .hud-chip .ico { width:34px; height:34px; }
@@ -127,7 +124,6 @@
 
     .hidden { display:none !important; }
 
-    /* ✨ حاوية قابلة للتمرير (ارتفاع ~6 عناصر) */
     .scroll-grid {
       max-height: 340px;
       overflow-y: auto;
@@ -144,87 +140,119 @@
     }
     .scroll-grid::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    /* القائمتان نشطتان دائمًا، مع إظهار ستة عناصر وزر عرض المزيد */
-    #country-grid, #service-grid { max-height: 420px; overflow-y: auto; overscroll-behavior: contain; }
-    .country-btn.service-match { border-color:#d17b9b !important; }
-    .service-btn.unavailable-choice { opacity:.6; }
+    /* ✨ تصميم شريط الوقت المتبقي */
+    .sms-timer-wrap {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+    .sms-timer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .sms-timer-head .label { color: #64748b; }
+    .sms-timer-head .time {
+      color: #2563eb;
+      font-family: 'Courier New', monospace;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+    .sms-timer-bar-bg {
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .sms-timer-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      border-radius: 999px;
+      transition: width 1s linear;
+      width: 100%;
+    }
+    .sms-timer-bar.warning {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+    .sms-timer-bar.danger {
+      background: linear-gradient(90deg, #ef4444, #f87171);
+      animation: pulseBar 1s infinite;
+    }
+    @keyframes pulseBar {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
 
-    /* Rival Store: accessible navigation with visible labels at all sizes */
-    :root { --rival:#951e32; --rival-dark:#641222; --rival-light:#fff3f4; --rival-gold:#e7bb74; }
-    html,body { background:#faf8f8; }
-    .hud-top {
-      background:linear-gradient(115deg,#10131c 0%,#21151d 65%,#301720 100%);
-      border-top:4px solid #aa2030;
-      border-bottom:1px solid rgba(231,187,116,.35);
-      box-shadow:0 5px 20px rgba(27,10,14,.2);
+    /* ✨ بطاقة عرض الكود المستلم */
+    .sms-code-display {
+      background: #f0f9ff;
+      border: 2px dashed #38bdf8;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      animation: popIn .3s ease;
     }
-    .rival-nav { display:flex; align-items:center; gap:9px; flex-wrap:nowrap; }
-    .rival-brand {
-      width:116px; height:55px; display:flex; align-items:center; justify-content:center;
-      border-radius:13px; background:rgba(255,255,255,.08);
-      border:1px solid rgba(231,187,116,.35); padding:3px 8px;
-      margin-inline-end:10px; flex:0 0 auto; text-decoration:none; overflow:hidden;
+    @keyframes popIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
-    .rival-brand img { max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain; display:block; border-radius:6px; }
-    .hud-chip {
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      min-height:48px; padding:7px 12px; border-radius:14px;
-      border:1px solid rgba(255,255,255,.17);
-      background:rgba(255,255,255,.07); color:#fff !important;
-      box-shadow:0 2px 9px rgba(0,0,0,.1);
-      font:700 13px/1.2 'Segoe UI',system-ui,sans-serif;
-      white-space:nowrap; text-decoration:none; cursor:pointer;
+    .sms-code-display .code-text {
+      font-family: 'Courier New', monospace;
+      font-size: 22px;
+      font-weight: 900;
+      color: #0369a1;
+      letter-spacing: 4px;
+      direction: ltr;
+      flex: 1;
+      text-align: center;
+      word-break: break-all;
     }
-    .hud-chip .hud-label { display:inline !important; visibility:visible; opacity:1; color:#fff; }
-    .hud-chip .ico {
-      width:35px; height:35px; display:inline-flex; align-items:center; justify-content:center;
-      flex:0 0 35px; border-radius:11px;
+    .sms-code-display .copy-btn {
+      background: #38bdf8;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      transition: background .15s, transform .1s;
+      white-space: nowrap;
+      width: 100%;
     }
-    .hud-chip .ico svg { width:22px; height:22px; stroke-width:2.6; }
-    .hud-chip.whatsapp .ico { color:#5af0ad; background:rgba(16,185,129,.2); border-color:rgba(90,240,173,.4); }
-    .hud-chip.voucher .ico { color:#f6c97f; background:rgba(215,167,94,.19); border-color:rgba(246,201,127,.48); }
-    .hud-chip.buy .ico { color:#ffa4bf; background:rgba(149,30,50,.32); border-color:rgba(255,164,191,.5); }
-    .hud-chip.verify .ico { color:#f5d27e; background:rgba(225,174,77,.2); border-color:rgba(245,210,126,.5); }
-    .hud-chip:focus-visible,.rival-brand:focus-visible { outline:2px solid var(--rival-gold); outline-offset:3px; }
-    .hud-chip:hover { transform:translateY(-2px); background:rgba(255,255,255,.15); border-color:var(--rival-gold); }
-    .main-area { padding-top:100px; }
-    /* Display actual country flag images instead of unsupported Windows emoji glyphs */
-    .country-flag-image { width:32px; height:23px; object-fit:cover; border-radius:4px; display:block; flex-shrink:0; box-shadow:0 1px 4px rgba(15,23,42,.15); }
-    .country-flag-fallback { font-weight:800; font-size:15px; color:#64748b; }
-    .popular-flag-image { width:20px; height:15px; object-fit:cover; border-radius:2px; vertical-align:middle; display:inline-block; }
-
-    .glass:focus { border-color:var(--rival); box-shadow:0 0 0 3px rgba(149,30,50,.12); }
-    .country-btn:hover,.service-btn:not(:disabled):hover { border-color:#d17b9b!important; background:var(--rival-light)!important; }
-    .country-btn.border-blue-500,.service-btn.border-blue-500 { border-color:var(--rival)!important; background:var(--rival-light)!important; }
-    #buy-btn:not(:disabled) { background:linear-gradient(120deg,var(--rival),var(--rival-dark)); box-shadow:0 5px 15px rgba(149,30,50,.18); }
-    #buy-btn:not(:disabled):hover { filter:brightness(1.08); }
-    button,a { -webkit-tap-highlight-color:transparent; }
-    @media (max-width:800px) {
-      .hud-top { padding:7px 10px; }
-      .rival-nav { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
-      .rival-brand { grid-column:1/-1; justify-self:center; width:112px; height:40px; margin:0; padding:2px 8px; }
-      .hud-chip { width:100%; min-width:0; min-height:61px; flex-direction:column; gap:4px; padding:6px 2px; border-radius:11px; font-size:11px; }
-      .hud-chip .ico { flex:0 0 28px; width:28px; height:28px; border-radius:8px; }
-      .hud-chip .ico svg { width:19px; height:19px; }
-      .hud-chip .hud-label { display:block !important; font-size:10px; line-height:1.2; text-align:center; white-space:nowrap; }
-      .main-area { padding-top:145px; }
+    .sms-code-display .copy-btn:hover { background: #0ea5e9; }
+    .sms-code-display .copy-btn:active { transform: scale(0.96); }
+    .sms-code-display .copy-btn.with-country {
+      background: #10b981;
     }
-    @media (max-width:360px) {
-      .hud-chip { font-size:10px; }
-      .hud-chip .hud-label { font-size:10px; }
-      .rival-nav { gap:4px; }
+    .sms-code-display .copy-btn.with-country:hover {
+      background: #059669;
     }
   </style>
 </head>
 <body>
 
-  <!-- ═══════════════ HUD TOP (4 أزرار) ═══════════════ -->
+  <!-- ═══════════════ HUD TOP ═══════════════ -->
   <div class="hud-top">
-    <div class="max-w-5xl mx-auto rival-nav">
+    <div class="max-w-5xl mx-auto flex items-center gap-2 flex-wrap">
 
-      <a class="rival-brand" href="https://rivalstore.xyz/" target="_blank" rel="noopener" aria-label="زيارة متجر رايفل ستور" title="Rival Store">
-        <img src="https://cdn.salla.sa/vPmPa/GEB4GPK4bnxUKZLj4hkjmwiqm6raDvjxEb6eaTQx.jpg" alt="Rival Store" loading="eager" referrerpolicy="no-referrer" />
-      </a>
+      <div class="font-black text-sm tracking-tight bg-gradient-to-l from-sky-400 to-violet-400 bg-clip-text text-transparent mr-1">
+        JAMAL
+      </div>
 
       <!-- 💬 واتساب -->
       <a href="https://wa.me/966578405137" target="_blank" rel="noopener"
@@ -235,7 +263,7 @@
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.464 3.488"/>
           </svg>
         </span>
-        <span class="hud-label">خدمة العملاء</span>
+        <span class="hidden sm:inline">واتساب</span>
       </a>
 
       <!-- 🎟️ شراء كود -->
@@ -249,7 +277,7 @@
             <path d="M13 5v2M13 17v2M13 11v2"/>
           </svg>
         </span>
-        <span class="hud-label">شراء كود</span>
+        <span class="hidden sm:inline">شراء كود</span>
       </a>
 
       <!-- 📱 شراء رقم -->
@@ -262,7 +290,7 @@
             <path d="M11 18h2"/>
           </svg>
         </span>
-        <span class="hud-label">شراء رقم</span>
+        <span class="hidden sm:inline">شراء رقم</span>
       </button>
 
       <!-- 🔍 تحقق -->
@@ -276,7 +304,7 @@
             <path d="m8.5 11 1.8 1.8L13 10"/>
           </svg>
         </span>
-        <span class="hud-label">تحقق</span>
+        <span class="hidden sm:inline">تحقق</span>
       </button>
 
     </div>
@@ -310,7 +338,7 @@
           </span>
         </div>
         <button type="button" onclick="refreshPrices(this)"
-                class="text-[11px] font-bold text-rose-800 hover:text-rose-900 border border-rose-200 hover:border-rose-400 bg-white px-3 py-1 rounded-lg transition-colors">
+                class="text-[11px] font-bold text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-400 bg-white px-3 py-1 rounded-lg transition-colors">
           🔄 تحديث البيانات
         </button>
       </div>
@@ -332,7 +360,7 @@
                   data-service-id="{{ p.service_id }}"
                   data-popular-index="{{ loop.index0 }}"
                   onclick="quickBuy('{{ p.country_slug }}', '{{ p.service_id }}')"
-                  class="group relative bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-rose-400 hover:shadow-md transition-all p-3 text-right overflow-hidden {% if loop.index > 6 %}hidden{% endif %}">
+                  class="group relative bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-blue-400 hover:shadow-md transition-all p-3 text-right overflow-hidden {% if loop.index > 6 %}hidden{% endif %}">
             <span class="absolute top-2 left-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
               {{ p.count }}+
             </span>
@@ -343,7 +371,7 @@
               <div class="text-center">
                 <div class="text-xs font-bold text-slate-700 truncate">{{ p.service_name }}</div>
                 <div class="text-[10px] text-slate-400 flex items-center justify-center gap-1 mt-0.5">
-                  <span class="popular-country-flag" data-country-slug="{{ p.country_slug }}">{{ p.country_flag }}</span>
+                  <span>{{ p.country_flag }}</span>
                   <span>{{ p.country_name }}</span>
                 </div>
               </div>
@@ -358,7 +386,7 @@
                   onclick="togglePopular(this)"
                   data-expanded="false"
                   data-preview="6"
-                  class="text-xs font-bold text-rose-800 hover:text-rose-900 border border-rose-200 hover:border-rose-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1">
+                  class="text-xs font-bold text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1">
             <span class="label">عرض المزيد ({{ popular_services|length - 6 }})</span>
             <svg class="w-3.5 h-3.5 transition-transform duration-200 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -372,37 +400,10 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-4">
 
-          {# ══ الخطوة 1: البرامج ══ #}
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6" id="service-step">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">1</div>
-              <h3 class="text-base font-bold text-slate-800">اختر البرنامج أو الخدمة</h3>
-              <span class="text-[11px] text-slate-400">اختر البرنامج أولًا أو الدولة أولًا</span>
-            </div>
-
-            <div class="relative mb-3">
-              <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">🔍</span>
-              <input type="text" id="serviceSearch"
-                     placeholder="ابحث عن خدمة..."
-                     class="glass !pr-9 !bg-white text-sm w-full"
-                     oninput="filterServices(this.value)"
-                     autocomplete="off">
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 scroll-grid" id="service-grid"></div>
-            <div id="service-empty" class="hidden text-center text-xs text-slate-400 py-6">
-              لا توجد خدمات متاحة لهذه الدولة حالياً
-            </div>
-            <div id="service-no-results" class="hidden text-center text-xs text-slate-400 py-4">
-              لا توجد خدمة مطابقة لبحثك
-            </div>
-            <div id="service-more-wrap" class="hidden text-center mt-3"></div>
-          </div>
-
-          {# ══ الخطوة 2: الدولة ══ #}
+          {# ══ الخطوة 1: الدولة ══ #}
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
             <div class="flex items-center gap-3 mb-4">
-              <div class="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">2</div>
+              <div class="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">1</div>
               <h3 class="text-base font-bold text-slate-800">اختر الدولة</h3>
               <span class="text-[10px] text-slate-400">{{ countries|length }} دولة متاحة من 5SIM</span>
             </div>
@@ -423,8 +424,8 @@
                       data-slug="{{ c.slug }}"
                       data-code="{{ c.code }}"
                       data-country-index="{{ loop.index0 }}"
-                      class="country-btn flex items-center gap-2 p-3 rounded-xl border-2 border-slate-100 hover:border-rose-400 hover:bg-rose-50 transition-all text-right {% if loop.index > 6 %}hidden{% endif %}">
-                <span class="country-flag-slot" data-flag-code="{{ c.code }}" data-flag-value="{{ c.flag }}"><span class="country-flag-fallback">{{ c.flag }}</span></span>
+                      class="country-btn flex items-center gap-2 p-3 rounded-xl border-2 border-slate-100 hover:border-blue-400 hover:bg-blue-50 transition-all text-right {% if loop.index > 6 %}hidden{% endif %}">
+                <span class="text-2xl">{{ c.flag }}</span>
                 <div class="flex-1 min-w-0">
                   <div class="text-sm font-bold text-slate-700 truncate">{{ c.name }}</div>
                   <div class="text-[10px] text-slate-400">{{ c.services_count }} خدمة</div>
@@ -433,21 +434,51 @@
               {% endfor %}
             </div>
 
-            {% if countries|length > 6 %}
-            <div class="text-center mt-3" id="country-more-wrap">
-              <button type="button" onclick="toggleMore(this, '.country-btn', 'countryIndex')"
-                      data-expanded="false" data-preview="6"
-                      class="text-xs font-bold text-rose-800 border border-rose-200 hover:border-rose-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1">
-                <span class="label">عرض المزيد ({{ countries|length - 6 }})</span>
-                <span class="chevron">⌄</span>
-              </button>
-            </div>
-            {% endif %}
             <div id="country-no-results" class="hidden text-center text-xs text-slate-400 py-4">
               لا توجد دولة مطابقة لبحثك
             </div>
 
+            {% if countries|length > 6 %}
+            <div class="text-center mt-3" id="country-more-wrap">
+              <button type="button"
+                      onclick="toggleMore(this, '.country-btn', 'countryIndex')"
+                      data-expanded="false"
+                      data-preview="6"
+                      class="text-xs font-bold text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1">
+                <span class="label">عرض المزيد ({{ countries|length - 6 }})</span>
+                <svg class="w-3.5 h-3.5 transition-transform duration-200 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+            </div>
+            {% endif %}
+          </div>
 
+          {# ══ الخطوة 2: الخدمة ══ #}
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 opacity-50 pointer-events-none" id="service-step">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-7 h-7 rounded-full bg-slate-300 text-white text-xs font-bold flex items-center justify-center">2</div>
+              <h3 class="text-base font-bold text-slate-800">اختر الخدمة</h3>
+            </div>
+
+            <div class="relative mb-3">
+              <span class="absolute inset-y-0 right-3 flex items-center text-slate-400 text-sm pointer-events-none">🔍</span>
+              <input type="text" id="serviceSearch"
+                     placeholder="ابحث عن خدمة..."
+                     class="glass !pr-9 !bg-white text-sm w-full disabled:opacity-50"
+                     oninput="filterServices(this.value)"
+                     autocomplete="off"
+                     disabled>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 scroll-grid" id="service-grid"></div>
+            <div id="service-empty" class="hidden text-center text-xs text-slate-400 py-6">
+              لا توجد خدمات متاحة لهذه الدولة حالياً
+            </div>
+            <div id="service-no-results" class="hidden text-center text-xs text-slate-400 py-4">
+              لا توجد خدمة مطابقة لبحثك
+            </div>
+            <div id="service-more-wrap" class="hidden text-center mt-3"></div>
           </div>
 
           {# ══ الخطوة 3: التأكيد ══ #}
@@ -492,7 +523,7 @@
             </div>
 
             <button onclick="confirmPurchase()" id="buy-btn"
-                    class="w-full bg-rose-800 hover:bg-rose-900 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                    class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -506,7 +537,7 @@
           <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
             <h4 class="text-sm font-bold text-slate-800 mb-3">إحصائيات سريعة</h4>
             <div class="grid grid-cols-2 gap-3">
-              <div class="bg-rose-50 rounded-xl p-3 text-center">
+              <div class="bg-blue-50 rounded-xl p-3 text-center">
                 <div class="text-lg font-bold text-blue-600">{{ stats.total_orders }}</div>
                 <div class="text-[10px] text-slate-500">إجمالي الطلبات</div>
               </div>
@@ -534,7 +565,7 @@
 
   <!-- ═══════════════ MODALS ═══════════════ -->
 
-  <!-- ✨ Verify Code Modal — حقل الكود فقط -->
+  <!-- ✨ Verify Code Modal -->
   <div id="verifyCodeModal" class="modal-overlay" onclick="if(event.target===this) closeModal('verifyCodeModal')">
     <div class="modal-box p-5">
       <div class="flex items-center justify-between mb-4">
@@ -556,6 +587,95 @@
           🔍 تحقق
         </button>
         <div id="verifyResult" class="hidden p-3 rounded-lg text-xs"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✨ SMS Code Modal -->
+  <div id="smsCodeModal" class="modal-overlay" onclick="if(event.target===this) closeModal('smsCodeModal')">
+    <div class="modal-box p-5" style="max-width: 420px;">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-black text-base">📩 الرسائل المستلمة (SMS)</h3>
+        <button onclick="closeModal('smsCodeModal')" class="text-slate-400 hover:text-slate-600 text-xl">✕</button>
+      </div>
+
+      <!-- الرقم الحالي -->
+      <div class="mb-4">
+        <div class="flex justify-between items-center mb-1">
+          <label class="text-xs text-slate-500 font-bold">الرقم الحالي</label>
+        </div>
+        <div class="relative">
+          <input type="text" id="displayPhoneNumber" readonly
+                 class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-center font-mono text-lg font-bold text-slate-800 pr-10"
+                 value="—">
+          <button type="button" onclick="copyPhoneFromSmsModal()"
+                  class="absolute left-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- ✨ شريط الوقت المتبقي -->
+      <div class="sms-timer-wrap" id="smsTimerWrap">
+        <div class="sms-timer-head">
+          <span class="label">⏳ الوقت المتبقي</span>
+          <span class="time" id="smsTimerText">20:00</span>
+        </div>
+        <div class="sms-timer-bar-bg">
+          <div class="sms-timer-bar" id="smsTimerBar"></div>
+        </div>
+      </div>
+
+      <!-- ✨ حاوية الأكواد المستلمة -->
+      <div id="smsCodesContainer" class="mb-3"></div>
+
+      <!-- حالة الانتظار -->
+      <div id="smsWaitingState" class="text-center py-6">
+        <div class="inline-flex items-center gap-2 text-sm text-slate-500">
+          <svg class="animate-spin w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          في انتظار وصول الكود...
+        </div>
+      </div>
+
+      <!-- حالة مكتملة -->
+      <div id="smsCompletedState" class="hidden text-center py-4">
+        <div class="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl px-4 py-3 text-sm font-bold">
+          ✅ تم استلام الكود — الرقم مكتمل
+        </div>
+        <p class="text-[11px] text-slate-400 mt-2">لا يمكن الإلغاء أو الاسترجاع بعد استلام الكود</p>
+      </div>
+
+      <!-- أزرار التحكم -->
+      <div id="smsActionButtons" class="grid grid-cols-2 gap-2 mt-4">
+        <button type="button" onclick="banCurrentNumber()"
+                class="border-2 border-orange-400 text-orange-600 font-bold py-2.5 rounded-xl text-sm hover:bg-orange-50 transition-colors">
+          🚫 حظر الرقم
+        </button>
+        <button type="button" onclick="cancelCurrentNumber()"
+                class="border-2 border-red-400 text-red-600 font-bold py-2.5 rounded-xl text-sm hover:bg-red-50 transition-colors">
+          ❌ إلغاء
+        </button>
+      </div>
+
+      <!-- زر تغيير الرقم -->
+      <div id="smsChangeNumberBtn" class="hidden mt-4">
+        <button type="button" onclick="changeCurrentNumber()"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
+          🔄 تغيير الرقم
+        </button>
+      </div>
+
+      <!-- زر إغلاق بعد اكتمال الكود -->
+      <div id="smsCloseBtn" class="hidden mt-4">
+        <button type="button" onclick="closeModal('smsCodeModal')"
+                class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-xl text-sm transition-colors">
+          إغلاق
+        </button>
       </div>
     </div>
   </div>
@@ -624,7 +744,7 @@
       <div id="pr-cancelled" class="hidden">
         <p class="text-center text-sm text-slate-600 mb-3">تم إلغاء الطلب.</p>
         <button type="button" onclick="chooseAnotherNumber()"
-                class="w-full bg-rose-800 hover:bg-rose-900 text-white font-bold py-2.5 rounded-xl text-sm">
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm">
           🔄 اختيار رقم آخر
         </button>
       </div>
@@ -656,11 +776,13 @@
     const el = document.getElementById(id);
     if (el) el.classList.remove('open');
     document.body.style.overflow = '';
+    if (id === 'smsCodeModal') cleanupSmsModal();
   }
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
       document.body.style.overflow = '';
+      cleanupSmsModal();
     }
   });
 
@@ -752,12 +874,12 @@
   // HUD actions
   // ══════════════════════════════════════════════════════════
   function scrollToBuy() {
-    const target = document.getElementById('service-grid');
+    const target = document.getElementById('country-grid');
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // ══════════════════════════════════════════════════════════
-  // ✨ Verify Code — حقل الكود فقط
+  // Verify Code
   // ══════════════════════════════════════════════════════════
   async function doVerifyCode() {
     const code = (document.getElementById('verifyCodeInput').value || '').trim().toUpperCase();
@@ -778,7 +900,7 @@
       const r = await fetch('/api/v1/vouchers/check', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ code }),   // ← فقط الكود
+        body: JSON.stringify({ code }),
       });
       const d = await r.json();
 
@@ -816,86 +938,61 @@
   // ══════════════════════════════════════════════════════════
   // Country / Service selection
   // ══════════════════════════════════════════════════════════
-  // أنشئ قائمة البرامج من جميع الدول، ولا تربط عرضها باختيار دولة مسبقًا.
-  const ALL_SERVICES = (() => {
-    const map = new Map();
-    COUNTRIES.forEach(country => (country.services || []).forEach(svc => {
-      const key = String(svc.id);
-      const old = map.get(key);
-      if (!old) map.set(key, { id:svc.id, name:svc.name || key, count:0, available:false });
-      const item = map.get(key);
-      item.count += Number(svc.count || 0);
-      item.available = item.available || Boolean(svc.available) && Number(svc.count || 0) > 0;
-    }));
-    return Array.from(map.values());
-  })();
-
-  function getAvailability(country, serviceId) {
-    if (!country || !serviceId) return null;
-    return (country.services || []).find(s => String(s.id) === String(serviceId)) || null;
-  }
-
-  function refreshSelection() {
-    const matching = getAvailability(selectedCountry, selectedService && selectedService.id);
-    currentCount = matching && matching.available ? Number(matching.count || 0) : 0;
-    const confirm = document.getElementById('confirm-step');
-    const canBuy = Boolean(selectedCountry && selectedService && currentCount > 0);
-    confirm.classList.toggle('opacity-50', !canBuy);
-    confirm.classList.toggle('pointer-events-none', !canBuy);
-    document.querySelectorAll('.country-btn').forEach(b => {
-      const c = COUNTRIES.find(x => x.slug === b.dataset.slug);
-      const m = getAvailability(c, selectedService && selectedService.id);
-      b.classList.toggle('service-match', Boolean(selectedService && m && m.available && Number(m.count)>0));
-    });
-    updateConfirm();
-  }
-
   function selectCountry(slug, btn) {
     document.querySelectorAll('.country-btn').forEach(b => {
       b.classList.remove('border-blue-500','bg-blue-50'); b.classList.add('border-slate-100');
     });
     btn.classList.add('border-blue-500','bg-blue-50'); btn.classList.remove('border-slate-100');
-    const c = COUNTRIES.find(c => c.slug === slug);
-    selectedCountry = c ? {slug:c.slug,code:c.code,name:c.name,services:c.services||[]} : null;
-    renderServices();
-    refreshSelection();
-    if (selectedService && !currentCount) showAlert('البرنامج المحدد غير متوفر في هذه الدولة؛ اختر دولة أخرى أو برنامجًا آخر', 'info');
+
+    const country = COUNTRIES.find(c => c.slug === slug);
+    selectedCountry = country ? { slug: country.slug, code: country.code, name: country.name, services: country.services||[] } : null;
+    selectedService = null; currentCount = 0;
+    updateConfirm();
+    renderServices(selectedCountry ? selectedCountry.services : []);
+    document.getElementById('service-step').classList.remove('opacity-50','pointer-events-none');
+    document.getElementById('confirm-step').classList.add('opacity-50','pointer-events-none');
+
+    const ss = document.getElementById('serviceSearch');
+    if (ss) { ss.disabled = false; ss.value = ''; }
   }
 
-  function renderServices() {
+  function renderServices(services) {
     const grid = document.getElementById('service-grid');
     const empty = document.getElementById('service-empty');
     const moreWrap = document.getElementById('service-more-wrap');
-    const term = document.getElementById('serviceSearch')?.value || '';
     grid.innerHTML = ''; moreWrap.classList.add('hidden'); moreWrap.innerHTML = '';
-    empty.classList.toggle('hidden', ALL_SERVICES.length > 0);
-    const sorted = sortByPopularity(ALL_SERVICES, s => s.id);
+
+    const ss = document.getElementById('serviceSearch');
+    if (ss) ss.value = '';
+
+    const noRes = document.getElementById('service-no-results');
+    if (noRes) noRes.classList.add('hidden');
+
+    if (!services || services.length === 0) { empty.classList.remove('hidden'); return; }
+    empty.classList.add('hidden');
+    const sorted = sortByPopularity(services, s => s.id);
     sorted.forEach((s, idx) => {
-      const matching = getAvailability(selectedCountry, s.id);
-      const available = selectedCountry ? Boolean(matching && matching.available && Number(matching.count)>0) : Boolean(s.available);
-      const shownCount = selectedCountry ? Number(matching?.count || 0) : Number(s.count || 0);
       const btn = document.createElement('button');
       btn.type = 'button'; btn.dataset.id = s.id; btn.dataset.serviceIndex = idx;
-      btn.className = 'service-btn flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-100 transition-all hover:border-rose-400 hover:bg-rose-50' +
-        (available ? '' : ' unavailable-choice') + (idx >= PREVIEW_COUNT ? ' hidden' : '');
-      btn.onclick = () => selectService(s.id, shownCount, btn);
-      if (selectedService && String(selectedService.id) === String(s.id)) btn.classList.add('border-blue-500','bg-blue-50');
-      const icon = document.createElement('div');
-      icon.className = 'w-10 h-10 flex items-center justify-center';
-      icon.innerHTML = serviceIconHtml(s.id, s.name, 30);
-      const name = document.createElement('span');
-      name.className = 'text-xs font-bold text-slate-700'; name.textContent = s.name;
-      const count = document.createElement('span');
-      count.className = 'text-[10px] text-slate-500';
-      count.textContent = available ? (selectedCountry ? shownCount + ' رقم متاح' : 'متاح في دول متعددة') : 'غير متوفر حاليًا';
-      btn.append(icon,name,count);
+      btn.className = 'service-btn flex flex-col items-center gap-1 p-3 rounded-xl border-2 border-slate-100 transition-all ' +
+        (s.available ? 'hover:border-blue-400 hover:bg-blue-50' : 'opacity-40 cursor-not-allowed');
+      if (idx >= PREVIEW_COUNT) btn.classList.add('hidden');
+      if (s.available) btn.onclick = () => selectService(s.id, s.count, btn);
+      else btn.disabled = true;
+      const iconEl = document.createElement('div');
+      iconEl.className = 'w-10 h-10 flex items-center justify-center';
+      iconEl.innerHTML = serviceIconHtml(s.id, s.name, 30);
+      const nameEl = document.createElement('span');
+      nameEl.className = 'text-xs font-bold text-slate-700'; nameEl.textContent = s.name;
+      btn.appendChild(iconEl); btn.appendChild(nameEl);
+      const countHtml = s.available ? '<span class="text-[9px] text-slate-400">'+s.count+' متاح</span>' : '<span class="text-[10px] text-slate-400">غير متاح</span>';
+      btn.insertAdjacentHTML('beforeend', countHtml);
       grid.appendChild(btn);
     });
     if (sorted.length > PREVIEW_COUNT) {
       moreWrap.classList.remove('hidden');
-      moreWrap.innerHTML = `<button type="button" onclick="toggleMore(this, '.service-btn', 'serviceIndex')" data-expanded="false" data-preview="6" class="text-xs font-bold text-rose-800 border border-rose-200 hover:border-rose-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1"><span class="label">عرض المزيد (${sorted.length-PREVIEW_COUNT})</span> <span class="chevron">⌄</span></button>`;
+      moreWrap.innerHTML = '<button type="button" onclick="toggleMore(this, \'.service-btn\', \'serviceIndex\')" data-expanded="false" data-preview="'+PREVIEW_COUNT+'" class="text-xs font-bold text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-400 bg-white px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-1"><span class="label">عرض المزيد ('+(sorted.length-PREVIEW_COUNT)+')</span><svg class="w-3.5 h-3.5 transition-transform duration-200 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>';
     }
-    filterServices(term);
   }
 
   function toggleMore(btn, selector, indexAttr) {
@@ -932,16 +1029,17 @@
       b.classList.remove('border-blue-500','bg-blue-50'); b.classList.add('border-slate-100');
     });
     btn.classList.add('border-blue-500','bg-blue-50'); btn.classList.remove('border-slate-100');
-    const svc = ALL_SERVICES.find(s => String(s.id) === String(id));
-    selectedService = { id, name:(svc && svc.name) || id };
-    refreshSelection();
-    if (selectedCountry && !currentCount) showAlert('هذا البرنامج غير متوفر في الدولة المحددة', 'info');
+    const svc = ((selectedCountry && selectedCountry.services) || []).find(s => String(s.id) === String(id));
+    selectedService = { id, name: (svc && svc.name) || id };
+    currentCount = parseInt(count, 10) || 0;
+    document.getElementById('confirm-step').classList.remove('opacity-50','pointer-events-none');
+    updateConfirm();
   }
 
   function updateConfirm() {
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    set('confirm-country', (selectedCountry && selectedCountry.name) || 'اختر الدولة');
-    set('confirm-service', (selectedService && selectedService.name) || 'اختر البرنامج');
+    set('confirm-country', (selectedCountry && selectedCountry.name) || '—');
+    set('confirm-service', (selectedService && selectedService.name) || '—');
     set('confirm-count', currentCount ? currentCount + ' رقم' : '—');
   }
 
@@ -982,7 +1080,7 @@
   }
 
   // ══════════════════════════════════════════════════════════
-  // ✨ البحث (تطبيع النص)
+  // Search
   // ══════════════════════════════════════════════════════════
   function _norm(s) {
     return String(s || '')
@@ -1002,9 +1100,11 @@
     const noRes = document.getElementById('country-no-results');
 
     if (!q) {
-      const expanded = moreWrap?.querySelector('button')?.dataset.expanded === 'true';
-      buttons.forEach(b => b.classList.toggle('hidden', !expanded && Number(b.dataset.countryIndex ?? b.dataset.serviceIndex) >= PREVIEW_COUNT));
-      if (moreWrap) moreWrap.classList.toggle('hidden', buttons.length <= PREVIEW_COUNT);
+      buttons.forEach(b => {
+        const i = parseInt(b.dataset.countryIndex, 10);
+        b.classList.toggle('hidden', !isNaN(i) && i >= PREVIEW_COUNT);
+      });
+      if (moreWrap) moreWrap.classList.remove('hidden');
       if (noRes) noRes.classList.add('hidden');
       return;
     }
@@ -1020,7 +1120,7 @@
     });
 
     if (moreWrap) moreWrap.classList.add('hidden');
-    if (noRes) noRes.classList.toggle('hidden', matched !== 0);
+    if (noRes) noRes.classList.toggle('hidden', matched > 0);
 
     const scroller = document.getElementById('country-grid');
     if (scroller) scroller.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1035,9 +1135,11 @@
     const noRes = document.getElementById('service-no-results');
 
     if (!q) {
-      const expanded = moreWrap?.querySelector('button')?.dataset.expanded === 'true';
-      buttons.forEach(b => b.classList.toggle('hidden', !expanded && Number(b.dataset.countryIndex ?? b.dataset.serviceIndex) >= PREVIEW_COUNT));
-      if (moreWrap) moreWrap.classList.toggle('hidden', buttons.length <= PREVIEW_COUNT);
+      buttons.forEach(b => {
+        const i = parseInt(b.dataset.serviceIndex, 10);
+        b.classList.toggle('hidden', !isNaN(i) && i >= PREVIEW_COUNT);
+      });
+      if (moreWrap && buttons.length > PREVIEW_COUNT) moreWrap.classList.remove('hidden');
       if (noRes) noRes.classList.add('hidden');
       return;
     }
@@ -1046,19 +1148,19 @@
     buttons.forEach(b => {
       const name = _norm(b.querySelector('.text-xs.font-bold')?.textContent || '');
       const id = _norm(b.dataset.id || '');
-      const isMatch = name.includes(id ? q : q) || id.includes(q);
+      const isMatch = name.includes(q) || id.includes(q);
       b.classList.toggle('hidden', !isMatch);
       if (isMatch) matched++;
     });
 
     if (moreWrap) moreWrap.classList.add('hidden');
-    if (noRes) noRes.classList.toggle('hidden', matched !== 0);
+    if (noRes) noRes.classList.toggle('hidden', matched > 0);
 
     grid.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   // ══════════════════════════════════════════════════════════
-  // ✨ checkOrderVoucher — يرسل الزوج إن كان مختاراً، وإلا الكود فقط
+  // Voucher check
   // ══════════════════════════════════════════════════════════
   async function checkOrderVoucher() {
     const code = (document.getElementById('orderVoucherCode')?.value || '').trim().toUpperCase();
@@ -1139,6 +1241,10 @@
       const d = await r.json();
       if (r.ok) {
         CURRENT_ORDER = d;
+        // احتياط: إذا لم يُرجع الخادم كود الدولة، خذه من الدولة المختارة
+        if (!CURRENT_ORDER.country_prefix && !CURRENT_ORDER.country_code && selectedCountry) {
+          CURRENT_ORDER.country_prefix = selectedCountry.code;
+        }
         showPurchaseResult(d);
         btn.disabled = false; btn.innerHTML = original;
       } else {
@@ -1223,6 +1329,7 @@
     document.getElementById('pr-actions').classList.add('hidden');
     document.getElementById('pr-kept').classList.remove('hidden');
     if (window._waitTimer) { clearInterval(window._waitTimer); window._waitTimer = null; }
+    openSmsModal(CURRENT_ORDER ? CURRENT_ORDER.phone : '');
   }
 
   function chooseAnotherNumber() {
@@ -1234,7 +1341,7 @@
     const cs = document.getElementById('countrySearch');
     if (cs) { cs.value = ''; filterCountries(''); }
     const ss = document.getElementById('serviceSearch');
-    if (ss) { ss.value = ''; filterServices(''); }
+    if (ss) { ss.value = ''; ss.disabled = true; }
 
     const vc = document.getElementById('orderVoucherCode');
     if (vc) vc.value = '';
@@ -1246,6 +1353,266 @@
   function onClosePurchaseResult() {
     if (window._waitTimer) { clearInterval(window._waitTimer); window._waitTimer = null; }
     closeModal('purchaseResultModal');
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // SMS Modal — النظام الكامل
+  // ══════════════════════════════════════════════════════════
+  let smsTimerInterval = null;
+  let smsSecondsLeft = 1200; // 20 دقيقة
+  let smsCodeReceived = false;
+  let smsReceivedCodes = [];
+  let smsPollingInterval = null;
+
+  function openSmsModal(phone) {
+    smsCodeReceived = false;
+    smsReceivedCodes = [];
+    smsSecondsLeft = 1200;
+
+    document.getElementById('displayPhoneNumber').value = phone || '—';
+    document.getElementById('smsCodesContainer').innerHTML = '';
+    document.getElementById('smsWaitingState').classList.remove('hidden');
+    document.getElementById('smsCompletedState').classList.add('hidden');
+    document.getElementById('smsCompletedState').innerHTML = `
+      <div class="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl px-4 py-3 text-sm font-bold">
+        ✅ تم استلام الكود — الرقم مكتمل
+      </div>
+      <p class="text-[11px] text-slate-400 mt-2">لا يمكن الإلغاء أو الاسترجاع بعد استلام الكود</p>
+    `;
+    document.getElementById('smsActionButtons').classList.remove('hidden');
+    document.getElementById('smsChangeNumberBtn').classList.add('hidden');
+    document.getElementById('smsCloseBtn').classList.add('hidden');
+    document.getElementById('smsTimerWrap').classList.remove('hidden');
+
+    updateSmsTimerDisplay();
+    if (smsTimerInterval) clearInterval(smsTimerInterval);
+    smsTimerInterval = setInterval(() => {
+      smsSecondsLeft--;
+      updateSmsTimerDisplay();
+      if (smsSecondsLeft <= 0) {
+        clearInterval(smsTimerInterval);
+        smsTimerInterval = null;
+        onSmsTimeout();
+      }
+    }, 1000);
+
+    startSmsPolling();
+    openModal('smsCodeModal');
+  }
+
+  function updateSmsTimerDisplay() {
+    const m = Math.floor(Math.max(0, smsSecondsLeft) / 60);
+    const s = Math.max(0, smsSecondsLeft) % 60;
+    const txt = document.getElementById('smsTimerText');
+    const bar = document.getElementById('smsTimerBar');
+    if (txt) txt.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if (bar) {
+      const percent = (Math.max(0, smsSecondsLeft) / 1200) * 100;
+      bar.style.width = `${percent}%`;
+      bar.classList.remove('warning', 'danger');
+      if (percent <= 20) bar.classList.add('danger');
+      else if (percent <= 50) bar.classList.add('warning');
+    }
+  }
+
+  function onSmsTimeout() {
+    if (!smsCodeReceived) {
+      document.getElementById('smsWaitingState').classList.add('hidden');
+      const container = document.getElementById('smsCodesContainer');
+      container.innerHTML = `
+        <div class="text-center py-4">
+          <div class="inline-flex items-center gap-2 bg-red-50 text-red-700 border border-red-200 rounded-xl px-4 py-3 text-sm font-bold">
+            ⏰ انتهى وقت الانتظار
+          </div>
+          <p class="text-[11px] text-slate-400 mt-2">لم يصل الكود خلال 20 دقيقة</p>
+        </div>
+      `;
+      document.getElementById('smsActionButtons').classList.add('hidden');
+      document.getElementById('smsChangeNumberBtn').classList.remove('hidden');
+    }
+  }
+
+  // محاكاة استلام الأكواد — استبدلها باستدعاء API حقيقي
+  function startSmsPolling() {
+    if (smsPollingInterval) clearInterval(smsPollingInterval);
+    let pollCount = 0;
+    smsPollingInterval = setInterval(async () => {
+      pollCount++;
+      // ✨ استبدل هذا الجزء باستدعاء API حقيقي:
+      // const r = await fetch(`/api/v1/orders/${CURRENT_ORDER.id}/sms`);
+      // const d = await r.json();
+      // if (d.codes && d.codes.length > smsReceivedCodes.length) {
+      //   d.codes.forEach(c => addSmsCode(c));
+      // }
+
+      // محاكاة للتجربة فقط:
+      if (pollCount === 1) {
+        addSmsCode('1234');
+      } else if (pollCount === 2 && Math.random() > 0.5) {
+        addSmsCode('567890');
+      } else if (pollCount === 3 && Math.random() > 0.7) {
+        addSmsCode('ABCD');
+      }
+
+      if (smsReceivedCodes.length >= 3) {
+        clearInterval(smsPollingInterval);
+        smsPollingInterval = null;
+      }
+    }, 8000);
+  }
+
+  function addSmsCode(code) {
+    smsCodeReceived = true;
+    smsReceivedCodes.push(code);
+
+    document.getElementById('smsWaitingState').classList.add('hidden');
+    document.getElementById('smsCompletedState').classList.remove('hidden');
+
+    // إخفاء أزرار البان/الإلغاء — الرقم أصبح مكتملاً
+    document.getElementById('smsActionButtons').classList.add('hidden');
+    document.getElementById('smsChangeNumberBtn').classList.add('hidden');
+    document.getElementById('smsCloseBtn').classList.remove('hidden');
+
+    // إضافة الكود إلى الحاوية مع زرّي النسخ
+    const container = document.getElementById('smsCodesContainer');
+    const codeEl = document.createElement('div');
+    codeEl.className = 'sms-code-display';
+    codeEl.innerHTML = `
+      <div class="code-text">${code}</div>
+      <div class="flex flex-col gap-1 shrink-0">
+        <button type="button" class="copy-btn" onclick="copySmsCode('${code}', false)" title="نسخ الكود فقط">
+          📋 نسخ
+        </button>
+        <button type="button" class="copy-btn with-country" onclick="copySmsCode('${code}', true)" title="نسخ الكود مع كود الدولة">
+          🌍 مع الدولة
+        </button>
+      </div>
+    `;
+    container.appendChild(codeEl);
+  }
+
+  // ✨ نسخ الكود — مع أو بدون كود الدولة
+  function copySmsCode(code, withCountryCode) {
+    let text = code;
+    if (withCountryCode) {
+      let prefix = '';
+      if (CURRENT_ORDER) {
+        prefix = CURRENT_ORDER.country_prefix || CURRENT_ORDER.country_code || '';
+      }
+      if (!prefix && selectedCountry) {
+        prefix = selectedCountry.code || selectedCountry.slug || '';
+      }
+      prefix = String(prefix).replace(/^\+/, '');
+      text = prefix ? '+' + prefix + code : code;
+    }
+
+    navigator.clipboard.writeText(text).then(() => {
+      showAlert('📋 تم نسخ الكود' + (withCountryCode ? ' مع كود الدولة' : ''), 'success');
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      try {
+        document.execCommand('copy');
+        showAlert('📋 تم النسخ' + (withCountryCode ? ' مع كود الدولة' : ''), 'success');
+      }
+      catch(_) { showAlert('تعذّر النسخ', 'error'); }
+      ta.remove();
+    });
+  }
+
+  function copyPhoneFromSmsModal() {
+    const phone = document.getElementById('displayPhoneNumber').value;
+    if (!phone || phone === '—') return;
+    navigator.clipboard.writeText(phone).then(() => {
+      showAlert('📋 تم نسخ الرقم', 'success');
+    }).catch(() => {
+      showAlert('تعذّر النسخ', 'error');
+    });
+  }
+
+  // ✨ حظر الرقم (بان)
+  async function banCurrentNumber() {
+    if (smsCodeReceived) return;
+    if (smsTimerInterval) { clearInterval(smsTimerInterval); smsTimerInterval = null; }
+
+    if (CURRENT_ORDER && CURRENT_ORDER.id) {
+      try { await fetch(`/api/v1/orders/${CURRENT_ORDER.id}/ban`, { method: 'POST' }); }
+      catch(e) { /* تجاهل */ }
+    }
+
+    document.getElementById('smsActionButtons').classList.add('hidden');
+    document.getElementById('smsChangeNumberBtn').classList.remove('hidden');
+    document.getElementById('smsCompletedState').classList.remove('hidden');
+    document.getElementById('smsCompletedState').innerHTML = `
+      <div class="inline-flex items-center gap-2 bg-orange-50 text-orange-700 border border-orange-200 rounded-xl px-4 py-3 text-sm font-bold">
+        🚫 تم حظر الرقم — العداد متوقف
+      </div>
+    `;
+    showAlert('🚫 تم حظر الرقم', 'info');
+  }
+
+  // ✨ إلغاء الرقم
+  async function cancelCurrentNumber() {
+    if (smsCodeReceived) return;
+    if (smsTimerInterval) { clearInterval(smsTimerInterval); smsTimerInterval = null; }
+
+    if (CURRENT_ORDER && CURRENT_ORDER.id) {
+      try { await fetch(`/api/v1/orders/${CURRENT_ORDER.id}/cancel`, { method: 'POST' }); }
+      catch(e) { /* تجاهل */ }
+    }
+
+    document.getElementById('smsActionButtons').classList.add('hidden');
+    document.getElementById('smsChangeNumberBtn').classList.remove('hidden');
+    document.getElementById('smsCompletedState').classList.remove('hidden');
+    document.getElementById('smsCompletedState').innerHTML = `
+      <div class="inline-flex items-center gap-2 bg-red-50 text-red-700 border border-red-200 rounded-xl px-4 py-3 text-sm font-bold">
+        ❌ تم إلغاء الرقم — العداد متوقف
+      </div>
+      <p class="text-[11px] text-slate-400 mt-2">سيتم استرجاع المبلغ</p>
+    `;
+    showAlert('❌ تم إلغاء الرقم', 'info');
+  }
+
+  // ✨ تغيير الرقم — بنفس الدولة والخدمة
+  async function changeCurrentNumber() {
+    if (!selectedCountry || !selectedService) {
+      showAlert('اختر الدولة والخدمة أولاً', 'error');
+      return;
+    }
+
+    showAlert('⏳ جارٍ طلب رقم جديد...', 'info');
+
+    try {
+      const body = {
+        country: selectedCountry.slug,
+        service: selectedService.id,
+      };
+      const r = await fetch('/api/v1/orders', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(body),
+      });
+      const d = await r.json();
+      if (r.ok) {
+        CURRENT_ORDER = d;
+        if (!CURRENT_ORDER.country_prefix && !CURRENT_ORDER.country_code && selectedCountry) {
+          CURRENT_ORDER.country_prefix = selectedCountry.code;
+        }
+        closeModal('smsCodeModal');
+        setTimeout(() => openSmsModal(d.phone || '—'), 300);
+        showAlert('✅ تم تغيير الرقم', 'success');
+      } else {
+        showAlert('❌ ' + (d.detail || 'فشل تغيير الرقم'), 'error');
+      }
+    } catch(e) {
+      showAlert('❌ خطأ في الاتصال', 'error');
+    }
+  }
+
+  // تنظيف عند إغلاق النافذة
+  function cleanupSmsModal() {
+    if (smsTimerInterval) { clearInterval(smsTimerInterval); smsTimerInterval = null; }
+    if (smsPollingInterval) { clearInterval(smsPollingInterval); smsPollingInterval = null; }
   }
 
   // ══════════════════════════════════════════════════════════
@@ -1265,44 +1632,10 @@
     }
   }
 
-  // Flag images (Windows often displays flag emoji as two-letter country codes).
-  // Use small real flag images, keeping the original text as fallback.
-  function installCountryFlag(slot, code, fallbackText, popular = false) {
-    const candidate = String(code || '').trim().toLowerCase();
-    const fallback = String(fallbackText || '').trim();
-    const iso = /^[a-z]{2}$/.test(candidate) ? candidate :
-      (/^[a-z]{2}$/i.test(fallback) ? fallback.toLowerCase() : '');
-    if (!iso) return;
-    const image = document.createElement('img');
-    image.src = 'https://flagcdn.com/w80/' + iso + '.png';
-    image.alt = 'علم ' + iso.toUpperCase();
-    image.loading = 'lazy';
-    image.decoding = 'async';
-    image.className = popular ? 'popular-flag-image' : 'country-flag-image';
-    image.onerror = () => {
-      slot.textContent = fallback || iso.toUpperCase();
-      slot.classList.add('country-flag-fallback');
-    };
-    slot.replaceChildren(image);
-  }
-
-  function hydrateCountryFlags() {
-    document.querySelectorAll('.country-flag-slot').forEach(slot => {
-      installCountryFlag(slot, slot.dataset.flagCode, slot.dataset.flagValue);
-    });
-    document.querySelectorAll('.popular-country-flag').forEach(slot => {
-      const slug = slot.dataset.countrySlug;
-      const country = COUNTRIES.find(c => String(c.slug) === String(slug));
-      if (country) installCountryFlag(slot, country.code, country.flag, true);
-    });
-  }
-
   // Init
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('[data-popular-item]').forEach((el,i) => el.dataset.popularIndex = i);
     hydrateServiceIcons(document);
-    hydrateCountryFlags();
-    if (document.getElementById('service-grid')) renderServices();
   });
   </script>
 </body>
