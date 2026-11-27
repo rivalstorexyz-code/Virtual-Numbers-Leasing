@@ -1,7 +1,7 @@
 """الطلبات: إنشاء، مزامنة، فحص، إنهاء، إلغاء."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, HTTPException, Request
 
@@ -61,6 +61,83 @@ def _ensure_order_open(order: dict) -> None:
             400,
             f"الطلب مغلق بالفعل (الحالة: {order['status']}) — لا يمكن تنفيذ العملية",
         )
+
+
+
+
+def _record_voucher_status(voucher: dict, status: str) -> None:
+    """Append an immutable audit entry for each new voucher state change."""
+    timestamp = now_iso()
+    voucher["status_updated_at"] = timestamp
+    voucher.setdefault("status_events", []).append({
+        "status": status, "at": timestamp, "attempts": int(voucher.get("attempts") or 0)
+    })
+
+
+def _voucher_for_order(order: dict) -> dict | None:
+    code = order.get("paid_by_voucher")
+    if not code:
+        return None
+    return next((v for v in STORE["vouchers"] if v.get("code") == code), None)
+
+
+def _mark_voucher_used_on_sms(order: dict) -> bool:
+    """Consume only after a real SMS arrives from the supplier."""
+    v = _voucher_for_order(order)
+    if not v or v.get("status") != "reserved":
+        return False
+    if v.get("reserved_order_id") != order["id"]:
+        return False
+    v["status"] = "used"
+    _record_voucher_status(v, "used")
+    v["used_at"] = now_iso()
+    v["reserved_order_id"] = None
+    v["used_on"] = {"country": order["country_slug"], "service": order["service_id"]}
+    # Give change from the prepaid voucher only after successful SMS delivery.
+    if not order.get("voucher_remainder_settled"):
+        remaining = round(float(v["value"]) - float(order["price"]), 2)
+        if remaining > 0:
+            customer = next((c for c in STORE["customers"].values() if c.get("id") == order["customer_id"]), None) if isinstance(STORE["customers"], dict) else next((c for c in STORE["customers"] if c.get("id") == order["customer_id"]), None)
+            if customer:
+                customer["balance"] += remaining
+                STORE["transactions"].append({
+                    "id": _next_id(STORE["transactions"]),
+                    "customer_id": order["customer_id"],
+                    "type": "voucher_remainder",
+                    "description": f"باقي كود {v['code']} بعد وصول الرسالة",
+                    "amount": remaining,
+                    "balance_after": customer["balance"],
+                    "created_at": now_iso(),
+                    "date": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M"),
+                })
+        order["voucher_remainder_settled"] = True
+    return True
+
+
+def _release_voucher_after_supplier_cancel(order: dict) -> bool:
+    """Never release a voucher on a local timeout alone."""
+    v = _voucher_for_order(order)
+    if not v or v.get("status") != "reserved" or v.get("reserved_order_id") != order["id"]:
+        return False
+    if any(s.get("order_id") == order["id"] for s in STORE["sms"]):
+        return False
+    v["status"] = "retry"
+    _record_voucher_status(v, "retry")
+    v["reserved_order_id"] = None
+    v["used_by"] = None
+    v["used_at"] = None
+    v["used_on"] = None
+    v["last_failure"] = "لم تصل رسالة SMS"
+    v["last_failure_at"] = now_iso()
+    if not order.get("voucher_release_settled"):
+        STORE["owner_wallet"]["total_profit"] -= order.get("profit", 0.0)
+        STORE["owner_wallet"]["reserved_for_5sim"] -= order.get("fivesim_cost", 0.0)
+        order["voucher_release_settled"] = True
+    return True
+
+
+def _has_sms(order: dict, provider_data: dict | None = None) -> bool:
+    return bool((provider_data or {}).get("sms") or any(s.get("order_id") == order["id"] for s in STORE["sms"]))
 
 
 # ══════════════════════════════════════════════════════════════
@@ -210,6 +287,7 @@ async def create_order(payload: OrderCreate, request: Request):
         "sms": sim5_order.get("sms") or [],
         "paid_by_voucher": voucher["code"] if voucher else None,
         "refunded": False,  # 🔒 إصلاح: علم صريح لمنع الاسترداد المزدوج
+        "voucher_remainder_settled": False,
     }
     STORE["orders"].append(order)
 
@@ -232,26 +310,14 @@ async def create_order(payload: OrderCreate, request: Request):
     })
 
     if voucher:
-        voucher["status"] = "used"
+        voucher["status"] = "reserved"
+        voucher["attempts"] = int(voucher.get("attempts") or 0) + 1
+        _record_voucher_status(voucher, "reserved")
+        voucher["reserved_order_id"] = order_id
+        voucher["reserved_at"] = now.isoformat()
         voucher["used_by"] = cid
-        voucher["used_at"] = now.isoformat()
-        voucher["used_on"] = {
-            "country": country["slug"],
-            "service": service["id"],
-        }
-        remaining = round(voucher["value"] - sale_price, 2)
-        if remaining > 0:
-            customer["balance"] += remaining
-            STORE["transactions"].append({
-                "id": _next_id(STORE["transactions"]),
-                "customer_id": cid,
-                "type": "voucher_remainder",
-                "description": f"باقي كود {voucher['code']} بعد الشراء",
-                "amount": remaining,
-                "balance_after": customer["balance"],
-                "created_at": now.isoformat(),
-                "date": now.strftime("%Y-%m-%d %H:%M"),
-            })
+        voucher["used_on"] = {"country": country["slug"], "service": service["id"]}
+        # Do not settle voucher or credit unused value until SMS is received.
     else:
         customer["balance"] -= sale_price
 
@@ -394,14 +460,36 @@ async def check_order(order_id: int, request: Request):
             if order["status"] == "RECEIVED":
                 n["status"] = "active"
 
+    if _has_sms(order, data):
+        _mark_voucher_used_on_sms(order)
+    else:
+        created = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00"))
+        if created.tzinfo is None:
+            created = created.replace(tzinfo=timezone.utc)
+        elapsed = datetime.now(timezone.utc) - created
+        if elapsed >= timedelta(minutes=30) and order["status"] not in CLOSED_STATUSES:
+            # Supplier cancellation must succeed before permitting a new attempt.
+            try:
+                cancelled = await sim5_get(f"/user/cancel/{order['sim5_id']}", auth=True)
+                order["status"] = cancelled.get("status", "CANCELED")
+            except Sim5Error:
+                pass
+        if elapsed >= timedelta(minutes=30) and order["status"] in {"CANCELED", "CANCELLED", "REFUNDED"}:
+            _release_voucher_after_supplier_cancel(order)
     persist_now()
 
     return {
         "ok": True,
         "status": order["status"],
         "expires": order["expires"],
+        "created_at": order["created_at"],
+        "phone": order["phone"],
+        "country": order["country"],
+        "service": order["service"],
+        "flag": order.get("flag", ""),
         "new_sms": imported,
         "sms": data.get("sms") or [],
+        "voucher_status": (_voucher_for_order(order) or {}).get("status"),
     }
 
 
@@ -418,6 +506,8 @@ async def finish_order(order_id: int, request: Request):
 
     # 🔒 إصلاح: منع إنهاء طلب مغلق مسبقاً
     _ensure_order_open(order)
+    if not _has_sms(order):
+        raise HTTPException(409, "لا يمكن إنهاء الطلب قبل وصول رسالة SMS")
 
     try:
         data = await sim5_get(f"/user/finish/{order['sim5_id']}", auth=True)
@@ -443,6 +533,8 @@ async def cancel_order(order_id: int, request: Request):
     # 🔒 إصلاح حرج: منع الاسترداد المزدوج
     # الكود القديم كان يسترد المبلغ في كل استدعاء، مما يسمح باستنزاف الرصيد
     _ensure_order_open(order)
+    if _has_sms(order):
+        raise HTTPException(409, "وصلت رسالة SMS بالفعل، لا يمكن استرجاع الكود")
 
     try:
         data = await sim5_get(f"/user/cancel/{order['sim5_id']}", auth=True)
@@ -450,6 +542,8 @@ async def cancel_order(order_id: int, request: Request):
         raise HTTPException(e.status or 503, e.message)
 
     order["status"] = data.get("status", "CANCELED")
+    if order["status"] not in {"CANCELED", "CANCELLED", "REFUNDED"}:
+        raise HTTPException(409, "المورد لم يؤكد الإلغاء؛ الكود يبقى محجوزًا")
 
     # 🔒 إصلاح: علم refunded يمنع أي استرداد لاحق حتى لو تغيرت الحالة
     if order.get("refunded"):
@@ -458,23 +552,19 @@ async def cancel_order(order_id: int, request: Request):
 
     order["refunded"] = True
 
-    # 🔒 إصلاح: الطلب المدفوع بكود يُسترد للرصيد مع توثيق المصدر
-    # الكود القديم كان يعيد المبلغ للرصيد النقدي دون أي إشارة إلى الكود،
-    # مما يجعل التتبع المالي مستحيلاً. هنا نوثّق المصدر بوضوح.
     refund = order["price"]
-    if order.get("paid_by_voucher"):
-        customer["balance"] += refund
-        refund_desc = (
-            f"استرداد طلب ملغي #{order_id} "
-            f"(مدفوع بكود {order['paid_by_voucher']})"
-        )
+    if order.get("paid_by_voucher") and _release_voucher_after_supplier_cancel(order):
+        # Restore voucher for a retry, rather than crediting a duplicate cash balance.
+        refund_desc = f"استعادة كود {order['paid_by_voucher']} بعد إلغاء طلب #{order_id}"
+        refund = 0.0
     else:
         customer["balance"] += refund
         refund_desc = f"استرداد طلب ملغي #{order_id}"
-
-    ow = STORE["owner_wallet"]
-    ow["total_profit"] -= order.get("profit", 0.0)
-    ow["reserved_for_5sim"] -= order.get("fivesim_cost", 0.0)
+        if not order.get("voucher_release_settled"):
+            ow = STORE["owner_wallet"]
+            ow["total_profit"] -= order.get("profit", 0.0)
+            ow["reserved_for_5sim"] -= order.get("fivesim_cost", 0.0)
+            order["voucher_release_settled"] = True
 
     STORE["transactions"].append({
         "id": _next_id(STORE["transactions"]),
@@ -494,3 +584,22 @@ async def cancel_order(order_id: int, request: Request):
     persist_now()
 
     return {"ok": True, "status": order["status"], "refund": refund}
+
+
+@router.post("/api/v1/orders/{order_id}/ban")
+async def ban_order(order_id: int, request: Request):
+    refresh()
+    customer = await get_current_customer(request)
+    order = _find_customer_order(customer["id"], order_id)
+    if not order or not order.get("sim5_id"):
+        raise HTTPException(404, "الطلب غير موجود")
+    _ensure_order_open(order)
+    if _has_sms(order):
+        raise HTTPException(409, "وصلت رسالة SMS بالفعل")
+    try:
+        data = await sim5_get(f"/user/ban/{order['sim5_id']}", auth=True)
+    except Sim5Error as exc:
+        raise HTTPException(exc.status or 503, exc.message)
+    order["status"] = data.get("status", "BANNED")
+    persist_now()
+    return {"ok": True, "status": order["status"], "note": "الحظر لا يعني استرداد قيمة الكود"}

@@ -27,6 +27,9 @@ Jamal Solutions — Admin Panel (standalone + shared storage)
 from __future__ import annotations
 
 import asyncio
+import base64
+import hashlib
+import hmac
 import os
 import secrets
 import sys
@@ -37,7 +40,7 @@ from typing import Any, Optional
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
@@ -449,6 +452,8 @@ def _create_vouchers_batch(
             "code": code,
             "value": float(value),
             "status": "unused",
+            "status_updated_at": now.isoformat(),
+            "status_events": [{"status":"unused","at":now.isoformat(),"attempts":0}],
             "batch_id": batch_id,
             "note": note,
             "label": label,
@@ -483,7 +488,7 @@ def _normalize_pairs(v: dict) -> list[dict]:
 # ══════════════════════════════════════════════════════════════
 # 5) App
 # ══════════════════════════════════════════════════════════════
-app = FastAPI(title="Jamal Solutions — Admin Panel", version="2.5.1-open")
+app = FastAPI(title="Ramzon SMS — Admin Panel", version="3.0-secure")
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 if STATIC_DIR.exists():
@@ -493,9 +498,33 @@ if STATIC_DIR.exists():
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@virtual-num.com").strip().lower()
 
 
+ADMIN_SECRET = os.getenv("ADMIN_SECRET", "").strip()
+COOKIE_NAME = "ramzon_admin_session"
+SESSION_SECONDS = 12 * 3600
+
+def _signed_session() -> str:
+    exp = str(int(time.time()) + SESSION_SECONDS)
+    tag = hmac.new(ADMIN_SECRET.encode(), exp.encode(), hashlib.sha256).hexdigest()
+    return f"{exp}.{tag}"
+
+def _authenticated(request: Request) -> bool:
+    if not ADMIN_SECRET:
+        return False
+    token = request.cookies.get(COOKIE_NAME, "")
+    try:
+        exp, sig = token.split(".", 1)
+        if not exp.isascii() or not exp.isdecimal() or int(exp) < int(time.time()):
+            return False
+        expected = hmac.new(ADMIN_SECRET.encode(), exp.encode(), hashlib.sha256).hexdigest()
+        return hmac.compare_digest(sig, expected)
+    except (ValueError, TypeError):
+        return False
+
 def _check_admin(request: Request) -> None:
-    """🔓 بدون تسجيل دخول."""
-    return
+    if not ADMIN_SECRET:
+        raise HTTPException(503, "اضبط ADMIN_SECRET في متغيرات Render أولًا")
+    if not _authenticated(request):
+        raise HTTPException(401, "جلسة الإدارة غير صالحة؛ سجّل الدخول")
 
 
 # ══════════════════════════════════════════════════════════════
@@ -585,6 +614,8 @@ class PopularServicesUpdate(BaseModel):
 @app.get("/login", response_class=HTMLResponse)
 @app.get("/admin-panel", response_class=HTMLResponse)
 async def admin_panel(request: Request):
+    if not _authenticated(request):
+        return HTMLResponse("""<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>رمزون SMS — دخول الإدارة</title><style>body{font-family:system-ui;background:#0f172a;color:white;display:grid;place-items:center;min-height:90vh}form{background:#1e293b;padding:30px;border-radius:16px;width:min(360px,90vw)}input,button{box-sizing:border-box;width:100%;padding:12px;margin-top:15px;border-radius:9px;border:1px solid #64748b}button{background:#16a34a;color:white;cursor:pointer}small{color:#fca5a5}</style><form id="login"><h2>🔐 لوحة إدارة رمزون SMS</h2><p>أدخل كلمة مرور الإدارة</p><input id="password" type="password" required autocomplete="current-password" placeholder="كلمة المرور"><button>دخول</button><p><small id="msg"></small></p></form><script>document.querySelector('form').onsubmit=async e=>{e.preventDefault();const r=await fetch('/api/v1/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:document.querySelector('#password').value})});if(r.ok)location.href='/';else document.querySelector('#msg').textContent=r.status===503?'لم يتم إعداد كلمة مرور الإدارة في Render':'كلمة المرور غير صحيحة';};</script></html>""")
     return templates.TemplateResponse(request=request, name="admin.html", context={})
 
 
@@ -601,8 +632,8 @@ async def health():
         "status": "ok",
         "app": "admin",
         "version": app.version,
-        "auth": "open",
-        "store_file": _info["path"],
+        "auth": "protected" if ADMIN_SECRET else "unconfigured",
+        "store_file": "hidden",
         "store_file_exists": _info["exists"],
         "store_kind": _info["kind"],
         "sim5_enabled": SIM5_ENABLED,
@@ -639,18 +670,25 @@ async def health():
 # 8) Auth (توافقي)
 # ══════════════════════════════════════════════════════════════
 @app.post("/api/v1/admin/login")
-async def admin_login(payload: AdminLoginIn = None):
-    return {"ok": True, "token": "open"}
-
+async def admin_login(payload: AdminLoginIn):
+    if not ADMIN_SECRET:
+        raise HTTPException(503, "ADMIN_SECRET غير مضبوط")
+    if not payload.password or not secrets.compare_digest(payload.password.encode(), ADMIN_SECRET.encode()):
+        raise HTTPException(401, "كلمة المرور غير صحيحة")
+    resp = JSONResponse({"ok": True})
+    resp.set_cookie(COOKIE_NAME, _signed_session(), httponly=True, secure=True, samesite="strict", max_age=SESSION_SECONDS)
+    return resp
 
 @app.get("/api/v1/admin/whoami")
 async def admin_whoami(request: Request):
-    return {"ok": True, "email": ADMIN_EMAIL, "auth": "open"}
-
+    _check_admin(request)
+    return {"ok": True, "email": ADMIN_EMAIL, "auth": "password"}
 
 @app.post("/api/v1/admin/logout")
 async def admin_logout(request: Request):
-    return {"ok": True}
+    resp=JSONResponse({"ok": True})
+    resp.delete_cookie(COOKIE_NAME)
+    return resp
 
 
 # ══════════════════════════════════════════════════════════════
@@ -763,10 +801,12 @@ async def admin_list_vouchers(
         "total": len(vouchers),
         "unused": sum(1 for v in vouchers if v["status"] == "unused"),
         "used": sum(1 for v in vouchers if v["status"] == "used"),
+        "reserved": sum(1 for v in vouchers if v["status"] == "reserved"),
+        "retry": sum(1 for v in vouchers if v["status"] == "retry"),
         "expired": sum(1 for v in vouchers if v["status"] == "expired"),
         "disabled": sum(1 for v in vouchers if v["status"] == "disabled"),
         "total_value_unused": round(
-            sum(v["value"] for v in vouchers if v["status"] == "unused"), 2
+            sum(v["value"] for v in vouchers if v["status"] in ("unused", "retry")), 2
         ),
         "total_value_used": round(
             sum(v["value"] for v in vouchers if v["status"] == "used"), 2
@@ -1113,9 +1153,11 @@ async def admin_check_voucher(payload: VoucherCheckIn, request: Request):
     if not v:
         raise HTTPException(404, "الكود غير موجود")
 
-    if v["status"] != "unused":
+    if v["status"] not in ("unused", "retry"):
         status_ar = {
             "used": "مستخدم",
+            "reserved": "محجوز مؤقتًا",
+            "retry": "محاولة جديدة متاحة",
             "expired": "منتهي",
             "disabled": "معطّل",
         }.get(v["status"], v["status"])
@@ -1175,6 +1217,8 @@ async def admin_disable_voucher(voucher_id: int, request: Request):
     if v["status"] == "used":
         raise HTTPException(400, "لا يمكن تعطيل كود مستخدم")
     v["status"] = "disabled"
+    v["status_updated_at"] = datetime.now(timezone.utc).isoformat()
+    v.setdefault("status_events", []).append({"status":"disabled","at":v["status_updated_at"],"attempts":int(v.get("attempts") or 0)})
     _persist_now()
     return {"ok": True, "status": "disabled"}
 

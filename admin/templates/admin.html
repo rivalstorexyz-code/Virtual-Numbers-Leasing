@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>لوحة التحكم — جمال سولوشنز</title>
+  <title>لوحة التحكم — رمزون SMS</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -21,6 +21,10 @@
     .service-chip.unavailable { opacity: 0.55; }
     .cb-unavailable { outline: 2px solid #ef4444 !important; outline-offset: 1px; }
     .label-unavailable { opacity: 0.65; color: #f87171; }
+    .ramzon-nav-item {text-align:right;border-radius:.65rem;padding:.7rem .8rem;font-size:12px;font-weight:700;color:#cbd5e1;background:#0f172a;border:1px solid #334155;}
+    .ramzon-nav-item:hover,.ramzon-nav-item.active {background:#1d4ed8;color:white;border-color:#60a5fa;}
+    .ramzon-page.hidden{display:none!important;}
+    .ramzon-flag{font-size:1.3rem;vertical-align:middle}
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen text-slate-100">
@@ -29,10 +33,10 @@
   <header class="glass border-b border-slate-700 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-lg shadow">⚙️</div>
+        <img src="https://cdn.salla.sa/vPmPa/GEB4GPK4bnxUKZLj4hkjmwiqm6raDvjxEb6eaTQx.jpg" alt="شعار رمزون" class="w-10 h-10 rounded-lg object-contain bg-white p-1">
         <div>
           <h1 class="text-sm font-bold">لوحة التحكم</h1>
-          <p class="text-[10px] text-slate-400">جمال سولوشنز</p>
+          <p class="text-[10px] text-slate-400">رمزون SMS · الإدارة</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -44,7 +48,28 @@
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+  <div class="max-w-7xl mx-auto flex gap-5 px-3 md:px-4 py-5 items-start flex-col md:flex-row">
+    <aside class="w-full md:w-52 md:sticky md:top-20 bg-slate-800 border border-slate-700 rounded-2xl p-3 flex-shrink-0">
+      <nav id="ramzon-nav" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-1 gap-2" aria-label="التنقل بين أقسام الإدارة">
+        <button data-page="home" class="ramzon-nav-item">🏠 الرئيسية</button>
+        <button data-page="generate" class="ramzon-nav-item">🎟️ توليد الأكواد</button>
+        <button data-page="codes" class="ramzon-nav-item">🧾 الأكواد</button>
+        <button data-page="history" class="ramzon-nav-item">🕓 السجل</button>
+        <button data-page="popular" class="ramzon-nav-item">🔥 الأكثر طلبًا</button>
+        <button data-page="pricing" class="ramzon-nav-item">🌐 الأسعار</button>
+        <button data-page="settings" class="ramzon-nav-item">⚙️ الإعدادات</button>
+      </nav>
+    </aside>
+    <main id="ramzon-main" class="flex-1 min-w-0 space-y-5">
+      <section id="ramzon-home" class="ramzon-page space-y-4">
+        <h2 class="text-xl font-bold">🏠 الرئيسية</h2>
+        <div id="dashboard-stats" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+        <p class="text-xs text-amber-200">الإحصائيات هنا بحسب حالة الكوبون، ولا تمثل عمليات دفع مؤكدة في سلة دون ربط مبيعات سلة.</p>
+      </section>
+      <section id="ramzon-history" class="ramzon-page space-y-4 hidden"><h2 class="text-xl font-bold">🕓 سجل حالات الأكواد</h2><p class="text-xs text-slate-400">سجل حالات يبدأ تسجيل التغييرات الجديدة بعد نشر التحديث؛ البيانات القديمة تُعرض بآخر حالة متاحة فقط.</p><div id="status-history" class="bg-slate-800 rounded-xl border border-slate-700 p-4 overflow-auto"></div></section>
+      <section id="ramzon-settings" class="ramzon-page space-y-3 hidden bg-slate-800 border border-slate-700 rounded-xl p-5"><h2 class="text-xl font-bold">⚙️ الإعدادات</h2><label for="exchange-factor" class="text-sm">معامل عرض الدولار بالريال</label><div class="flex gap-2 items-center"><input type="number" id="exchange-factor" min="0.01" max="100" step="0.01" value="3.95" class="bg-slate-900 text-white p-2 rounded-lg border border-slate-600 w-32"><button onclick="saveExchangeFactor()" class="bg-emerald-600 px-4 py-2 rounded-lg">حفظ</button></div><p class="text-xs text-slate-400">1 دولار = 3.95 ريال افتراضيًا. هذا معامل عرض في لوحة الإدارة، ولا يغير أسعار المورد أو قيمة الكوبون بالدولار في قاعدة البيانات.</p></section>
+      <div id="ramzon-dynamic-pages" class="space-y-5"></div>
+
 
     <!-- ══ Wallet ══ -->
     <section>
@@ -56,8 +81,8 @@
         <button onclick="loadWallet(this)" class="text-xs font-bold text-blue-400 hover:text-blue-300 border border-slate-700 hover:border-blue-500/50 px-3 py-1.5 rounded-lg transition-colors">🔄 تحديث</button>
       </div>
       <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 stat-card text-center">
-        <div class="text-sm text-slate-400 mb-1">الرصيد الكلي</div>
-        <div id="total-balance" class="text-4xl font-black text-emerald-400">—</div>
+        <div class="text-sm text-slate-400 mb-1">الرصيد الفعلي لدى المورد (ريال)</div>
+        <div id="total-balance" class="text-4xl font-black text-emerald-400">—</div><div id="wallet-source" class="text-xs text-slate-400 mt-2">جارٍ الاستعلام...</div>
       </div>
     </section>
 
@@ -237,21 +262,42 @@
           </div>
         </div>
 
+        <!-- حاسبة سعر سلة ورسوم بوابة الدفع (التقدير لكل كود/طلب) -->
+        <div class="border border-amber-500/30 rounded-xl p-4 mb-3 bg-slate-900/50 space-y-3" id="salla-pricing-panel">
+          <h3 class="text-sm font-black text-amber-300">💳 تسعير سلة ورسوم بوابة الدفع</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div><label for="salla-sale-price" class="block text-xs text-slate-300 mb-1">سعر البيع في سلة (ر.س لكل كود)</label>
+              <input id="salla-sale-price" type="number" step="0.01" min="0" placeholder="مثال: 8.00" class="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-sm" aria-describedby="salla-price-info"></div>
+            <div><label for="salla-payment-method" class="block text-xs text-slate-300 mb-1">بوابة الدفع</label>
+              <select id="salla-payment-method" class="w-full bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-sm">
+                <option value="mada">مدى — 1% + 1 ريال</option><option value="visa">فيزا — 2.2% + 1 ريال</option><option value="apple">أبل باي — 2.2% + 1 ريال</option><option value="stc">STC Pay — 1.70% دون رسم ثابت</option>
+              </select></div>
+            <div><span class="block text-xs text-slate-300 mb-1">السعر المكافئ بالدولار</span><div id="salla-sale-usd" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-cyan-300">—</div></div>
+          </div>
+          <p id="salla-price-info" class="text-[10px] text-slate-400">الرسوم تقديرية وفق النسب التي حددتها؛ الضريبة 15% على رسوم الدفع فقط. نفترض عملية دفع مستقلة لكل كود. هذه الأرقام للمعاينة ولا تغيّر سعر المنتج في سلة أو قيمة القسيمة.</p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            <div class="p-2 bg-slate-950 rounded-lg border border-slate-700"><span class="text-slate-400 block text-[10px]">رسوم البوابة قبل الضريبة</span><b id="salla-fee-base">—</b></div>
+            <div class="p-2 bg-slate-950 rounded-lg border border-slate-700"><span class="text-slate-400 block text-[10px]">ضريبة الرسوم 15%</span><b id="salla-fee-vat">—</b></div>
+            <div class="p-2 bg-slate-950 rounded-lg border border-slate-700"><span class="text-slate-400 block text-[10px]">إجمالي رسوم بوابة سلة</span><b id="salla-fee-total">—</b></div>
+            <div class="p-2 bg-slate-950 rounded-lg border border-slate-700"><span class="text-slate-400 block text-[10px]">عدد الأكواد المتوقعة</span><b id="salla-code-count">—</b></div>
+          </div>
+        </div>
+
         <!-- ملخص + تحليل مالي -->
         <div class="bg-slate-800/50 rounded-lg p-3 mb-3">
           <div class="text-xs text-slate-300 mb-1" id="summary-text">—</div>
           <div id="financial-info" class="hidden mt-2 grid grid-cols-2 md:grid-cols-4 gap-2">
             <div class="bg-slate-900/60 rounded-lg p-2 border border-slate-700">
-              <div class="text-[10px] text-slate-400">تكلفة 5SIM</div>
-              <div id="fivesim-cost-label" class="text-xs font-bold text-red-400">$0.00</div>
+              <div class="text-[10px] text-slate-400">تكلفة المورد</div>
+              <div id="fivesim-cost-label" class="text-xs font-bold text-red-400">0.00 ر.س</div>
             </div>
             <div class="bg-slate-900/60 rounded-lg p-2 border border-slate-700">
-              <div class="text-[10px] text-slate-400">سعر البيع</div>
-              <div id="sale-price-label" class="text-xs font-bold text-amber-400">$0.00</div>
+              <div class="text-[10px] text-slate-400">سعر البيع في سلة (الإجمالي)</div>
+              <div id="sale-price-label" class="text-xs font-bold text-amber-400">0.00 ر.س</div>
             </div>
             <div class="bg-slate-900/60 rounded-lg p-2 border border-slate-700">
-              <div class="text-[10px] text-slate-400">الربح المتوقع</div>
-              <div id="profit-label" class="text-xs font-bold text-emerald-400">$0.00</div>
+              <div class="text-[10px] text-slate-400">صافي الربح بعد رسوم سلة</div>
+              <div id="profit-label" class="text-xs font-bold text-emerald-400">0.00 ر.س</div>
             </div>
             <div class="bg-slate-900/60 rounded-lg p-2 border border-slate-700">
               <div class="text-[10px] text-slate-400">هامش الربح</div>
@@ -350,7 +396,7 @@
         <summary class="cursor-pointer flex items-center justify-between list-none">
           <h2 class="text-lg font-bold flex items-center gap-2">
             <span class="w-1 h-5 bg-gradient-to-b from-cyan-400 to-sky-500 rounded-full"></span>
-            📊 كتالوج 5SIM (الأسعار)
+            📊 كتالوج الأسعار
           </h2>
           <span class="text-xs text-slate-400 group-open:rotate-180 transition-transform">▼</span>
         </summary>
@@ -388,13 +434,15 @@
       <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h2 class="text-lg font-bold flex items-center gap-2">
           <span class="w-1 h-5 bg-gradient-to-b from-blue-400 to-indigo-500 rounded-full"></span>
-          📋 الأكواد
+          🆕 الأكواد الجديدة
         </h2>
         <div class="flex items-center gap-2 flex-wrap">
           <select id="v-filter" onchange="loadVouchers()" class="text-xs bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 outline-none">
-            <option value="">الكل</option>
+            <option value="unused">الجديدة فقط</option>
             <option value="unused">غير مستخدمة</option>
             <option value="used">مستخدمة</option>
+            <option value="reserved">محجوزة مؤقتًا</option>
+            <option value="retry">محاولة جديدة</option>
             <option value="expired">منتهية</option>
             <option value="disabled">معطّلة</option>
           </select>
@@ -436,22 +484,22 @@
       <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
         <h2 class="text-lg font-bold flex items-center gap-2">
           <span class="w-1 h-5 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-full"></span>
-          ✅ الأكواد المستخدمة
+          🛍️ الأكواد المباعة / المستخدمة
         </h2>
         <button onclick="loadUsedVouchers(this)" class="text-xs font-bold text-blue-400 hover:text-blue-300 border border-slate-700 hover:border-blue-500/50 px-3 py-1.5 rounded-lg transition-colors">🔄 تحديث</button>
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4" id="used-summary">
         <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700">
-          <div class="text-[10px] text-slate-400">عدد الأكواد المستخدمة</div>
+          <div class="text-[10px] text-slate-400">الأكواد المستخدمة والمحاولات</div>
           <div class="text-lg font-bold text-emerald-400">—</div>
         </div>
         <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700">
-          <div class="text-[10px] text-slate-400">إجمالي القيمة</div>
+          <div class="text-[10px] text-slate-400">قيمة الأكواد المستخدمة (ليست مبيعات سلة)</div>
           <div class="text-lg font-bold text-amber-400">—</div>
         </div>
         <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700">
-          <div class="text-[10px] text-slate-400">آخر استخدام</div>
+          <div class="text-[10px] text-slate-400">آخر تحديث مسجل</div>
           <div class="text-[11px] font-bold text-slate-300">—</div>
         </div>
       </div>
@@ -481,10 +529,11 @@
     </section>
 
     <footer class="text-center text-[10px] text-slate-500 pt-4 pb-8">
-      <p>جمال سولوشنز · لوحة التحكم · <span id="footer-version">v2.5.1-open</span></p>
+      <p>رمزون SMS · لوحة التحكم · <span id="footer-version">v2.5.1-open</span></p>
       <p class="mt-1">آخر تحديث: <span id="last-refresh">—</span></p>
     </footer>
-  </main>
+    </main>
+  </div>
 </div>
 
 <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-slate-800 border-2 rounded-2xl px-6 py-3 text-sm font-bold shadow-2xl"></div>
@@ -561,17 +610,19 @@ function loadAll() {
 // ══════════════════════════════════════════════════════════════
 async function loadWallet(btn) {
   if (btn) btn.disabled = true;
+  const total = document.getElementById('total-balance');
+  const source = document.getElementById('wallet-source');
   try {
-    const r = await adminFetch('/api/v1/admin/wallet');
-    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const r = await adminFetch('/api/v1/admin/sim5-profile');
     const data = await r.json();
-    const v = data.total_balance ?? 0;
-    document.getElementById('total-balance').textContent = '$' + v.toFixed(2);
+    if (!r.ok || !data.ok || !Number.isFinite(Number(data.balance))) throw new Error(data.detail || 'تعذّر جلب الرصيد');
+    total.textContent = riyal(data.balance);
+    source.textContent = 'رصيد مباشر من حساب المورد (محول من الدولار)';
   } catch (e) {
-    console.error('loadWallet:', e);
-  } finally {
-    if (btn) btn.disabled = false;
-  }
+    total.textContent = 'غير متاح';
+    source.textContent = 'تعذّر التحديث من المورد — لن نعرض رصيدًا داخليًا بدل الحقيقي';
+    console.error('loadWallet',e);
+  } finally { if(btn) btn.disabled = false; }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -667,7 +718,7 @@ function updateMeta() {
 
   meta.innerHTML = `
     آخر تحديث: ${d.toLocaleTimeString('ar-EG')}
-    ${allPrices.length ? `<span class="text-amber-400"> · نطاق: $${minPrice.toFixed(2)} – $${maxPrice.toFixed(2)}</span>` : ''}
+    ${allPrices.length ? `<span class="text-amber-400"> · نطاق: ${riyal(minPrice)} – ${riyal(maxPrice)}</span>` : ''}
   `;
 
   document.getElementById('count-countries').textContent = totalCountries;
@@ -677,7 +728,7 @@ function updateMeta() {
   if (priceRangeBadge && allPrices.length) {
     priceRangeBadge.innerHTML = `
       <span class="inline-flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-bold px-3 py-1.5 rounded-lg">
-        💰 نطاق الأسعار: $${minPrice.toFixed(2)} – $${maxPrice.toFixed(2)} · ${allPrices.length} خدمة متاحة
+        💰 نطاق الأسعار: ${riyal(minPrice)} – ${riyal(maxPrice)} · ${allPrices.length} خدمة متاحة
       </span>
     `;
   }
@@ -734,9 +785,9 @@ function renderTree() {
 
     const priceLine = minPrice != null
       ? `<div class="text-[10px] text-amber-400 font-bold mt-0.5">
-           من <span class="text-amber-300">$${minPrice.toFixed(2)}</span>
-           <span class="text-slate-500 font-normal">· متوسط $${avgPrice.toFixed(2)}</span>
-           ${avgProfit != null ? `<span class="text-emerald-500">· +$${avgProfit.toFixed(2)}</span>` : ''}
+           من <span class="text-amber-300">${riyal(minPrice)}</span>
+           <span class="text-slate-500 font-normal">· متوسط ${riyal(avgPrice)}</span>
+           ${avgProfit != null ? `<span class="text-emerald-500">· +${riyal(avgProfit)}</span>` : ''}
          </div>`
       : `<div class="text-[10px] text-red-400 mt-0.5">لا أسعار متاحة</div>`;
 
@@ -788,10 +839,10 @@ function renderServiceRow(c, s) {
   if (s.available && salePrice != null) {
     priceHtml = `
       <div class="text-left leading-tight">
-        <div class="text-[12px] font-black text-emerald-400">$${salePrice.toFixed(2)}</div>
+        <div class="text-[12px] font-black text-emerald-400">${riyal(salePrice)}</div>
         <div class="text-[9px] text-slate-500">
-          5SIM: $${fivesimPrice != null ? fivesimPrice.toFixed(3) : '?'}
-          ${profit != null ? `<span class="text-amber-400"> (+$${profit.toFixed(2)})</span>` : ''}
+          تكلفة المورد: ${fivesimPrice != null ? riyal(fivesimPrice) : '?'}
+          ${profit != null ? `<span class="text-amber-400"> (+${riyal(profit)})</span>` : ''}
         </div>
       </div>
     `;
@@ -1074,7 +1125,7 @@ function renderMatrix() {
                              ? 'border-emerald-500 bg-emerald-500/20 text-emerald-300'
                              : 'border-slate-700 bg-slate-800/50 text-slate-400 hover:border-slate-500'}">
               <div class="font-bold">${selected ? '✓' : count}</div>
-              ${price != null ? `<div class="text-[9px] ${selected ? 'text-emerald-400' : 'text-amber-400'}">$${Number(price).toFixed(2)}</div>` : ''}
+              ${price != null ? `<div class="text-[9px] ${selected ? 'text-emerald-400' : 'text-amber-400'}">${riyal(Number(price))}</div>` : ''}
             </button>
           </td>`;
         }).join('')}
@@ -1170,72 +1221,63 @@ function updateModePreviews() {
 function updateFinancialInfo() {
   const financialEl = document.getElementById('financial-info');
   if (!financialEl) return;
-
   const pairs = Array.from(MATRIX.selectedPairs);
-  if (!pairs.length) {
+  const panel = document.getElementById('salla-pricing-panel');
+  if (!pairs.length || !CATALOG?.countries) {
     financialEl.classList.add('hidden');
+    if (panel) panel.querySelectorAll('[id^="salla-fee-"]').forEach(el => el.textContent = '—');
     return;
   }
-
-  const count = parseInt(document.getElementById('v-count')?.value, 10) || 1;
+  const count = Math.max(1, parseInt(document.getElementById('v-count')?.value, 10) || 1);
   const mode = document.querySelector('input[name="gen-mode"]:checked')?.value || 'merged';
-
-  let totalFivesim = 0;
-  let totalSale = 0;
-
+  // أرقام المورد بالدولار، وكل كود يسمح بشراء رقم واحد.
+  const catalogPair = key => {
+    const [countryId, serviceId] = key.split(':');
+    const country = CATALOG.countries.find(x => x.slug === countryId);
+    return country?.services?.find(x => x.id === serviceId);
+  };
+  let unitCosts = [];
   if (mode === 'merged') {
-    let maxCost = 0, maxSale = 0;
-    pairs.forEach(key => {
-      const [c, s] = key.split(':');
-      const country = CATALOG.countries.find(x => x.slug === c);
-      const service = country?.services?.find(x => x.id === s);
-      if (service?.available) {
-        maxCost = Math.max(maxCost, service.fivesim_cost || 0);
-        maxSale = Math.max(maxSale, service.cost || 0);
-      }
-    });
-    totalFivesim = maxCost * count;
-    totalSale = maxSale * count;
+    const maxCost = Math.max(0, ...pairs.map(k => Number(catalogPair(k)?.fivesim_cost || 0)));
+    unitCosts = Array(count).fill(maxCost);
   } else if (mode === 'groups') {
-    const groups = new Map();
-    pairs.forEach(key => {
-      const [c, s] = key.split(':');
-      if (!groups.has(c)) groups.set(c, []);
-      groups.get(c).push(s);
-    });
-    groups.forEach((services, c) => {
-      const country = CATALOG.countries.find(x => x.slug === c);
-      let maxCost = 0, maxSale = 0;
-      services.forEach(s => {
-        const service = country?.services?.find(x => x.id === s);
-        if (service?.available) {
-          maxCost = Math.max(maxCost, service.fivesim_cost || 0);
-          maxSale = Math.max(maxSale, service.cost || 0);
-        }
-      });
-      totalFivesim += maxCost * count;
-      totalSale += maxSale * count;
-    });
+    const grouped = new Map();
+    pairs.forEach(key => {const c=key.split(':')[0];if(!grouped.has(c)) grouped.set(c,[]);grouped.get(c).push(key);});
+    for(const keys of grouped.values()) {
+      const maxCost = Math.max(0,...keys.map(k=>Number(catalogPair(k)?.fivesim_cost || 0)));
+      unitCosts.push(...Array(count).fill(maxCost));
+    }
   } else {
-    pairs.forEach(key => {
-      const [c, s] = key.split(':');
-      const country = CATALOG.countries.find(x => x.slug === c);
-      const service = country?.services?.find(x => x.id === s);
-      if (service?.available) {
-        totalFivesim += (service.fivesim_cost || 0) * count;
-        totalSale += (service.cost || 0) * count;
-      }
-    });
+    pairs.forEach(key => unitCosts.push(...Array(count).fill(Number(catalogPair(key)?.fivesim_cost || 0))));
   }
-
-  const profit = totalSale - totalFivesim;
-  const pct = totalFivesim > 0 ? (profit / totalFivesim) * 100 : 0;
-
+  const qty = unitCosts.length;
+  const fx = Number(EXCHANGE_FACTOR) > 0 ? Number(EXCHANGE_FACTOR) : 3.95;
+  const totalCostSAR = unitCosts.reduce((sum,v)=>sum+v,0)*fx;
+  const saleInput = document.getElementById('salla-sale-price');
+  const rateLabel = document.getElementById('salla-sale-usd');
+  const singleSale = Math.max(0,Number(saleInput?.value)||0);
+  const method = document.getElementById('salla-payment-method')?.value || 'mada';
+  const rules = {mada:[0.01,1],visa:[0.022,1],apple:[0.022,1],stc:[0.017,0]};
+  const [percentage,fixed]=rules[method]||rules.mada;
+  // رسوم مستقلة لكل كود باعتباره عملية دفع واحدة. لا تُحسب رسوم على توليد أكواد غير مباعة فعليًا.
+  const feeBase = singleSale * percentage + (singleSale > 0 ? fixed : 0);
+  const feeVat = feeBase * 0.15;
+  const feeTotal = feeBase + feeVat;
+  const totalSaleSAR = qty*singleSale;
+  const netProfit = totalSaleSAR-totalCostSAR-qty*feeTotal;
+  const margin = totalSaleSAR > 0 ? 100*netProfit/totalSaleSAR : 0;
+  const sar=v => Number(v).toLocaleString('ar-SA',{minimumFractionDigits:2,maximumFractionDigits:2})+' ر.س';
   financialEl.classList.remove('hidden');
-  document.getElementById('fivesim-cost-label').textContent = '$' + totalFivesim.toFixed(2);
-  document.getElementById('sale-price-label').textContent = '$' + totalSale.toFixed(2);
-  document.getElementById('profit-label').textContent = '$' + profit.toFixed(2);
-  document.getElementById('profit-pct-label').textContent = pct.toFixed(0) + '%';
+  document.getElementById('fivesim-cost-label').textContent=sar(totalCostSAR);
+  document.getElementById('sale-price-label').textContent=sar(totalSaleSAR);
+  document.getElementById('profit-label').textContent=sar(netProfit);
+  document.getElementById('profit-label').className='text-xs font-bold '+(netProfit>=0?'text-emerald-400':'text-red-400');
+  document.getElementById('profit-pct-label').textContent=margin.toFixed(1)+'%';
+  if(rateLabel) rateLabel.textContent=(singleSale/fx).toFixed(2)+' $ (1$ = '+fx.toFixed(2)+' ر.س)';
+  document.getElementById('salla-fee-base').textContent=sar(feeBase);
+  document.getElementById('salla-fee-vat').textContent=sar(feeVat);
+  document.getElementById('salla-fee-total').textContent=sar(feeTotal);
+  document.getElementById('salla-code-count').textContent=String(qty);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1319,20 +1361,20 @@ async function generateMatrix(btn) {
     const lines = [];
     lines.push(`# ═══════════════════════════════════════`);
     if (label) lines.push(`# الاسم: ${label}`);
-    lines.push(`# الوضع: ${mode} | العدد الكلي: ${data.total_count} | القيمة: $${data.total_value}`);
+    lines.push(`# كود موحّد (${mode === "merged" ? MATRIX.selectedPairs.size : 1} زوج)`);
     lines.push(`# ═══════════════════════════════════════`);
     lines.push('');
     data.batches.forEach(b => {
       lines.push(`# ${b.label}`);
       lines.push(`# الأزواج: ${b.service}`);
       lines.push(`# العدد: ${b.count}`);
-      b.codes.forEach(c => lines.push(c));
+      b.codes.forEach(c => lines.push(`${c}   https://ramzon-sms.vercel.app/buy موقع استلام الرقم`));
       lines.push('');
     });
 
     document.getElementById('codes-output').value = lines.join('\n');
     document.getElementById('codes-output-wrap').classList.remove('hidden');
-    toast(`✅ تم توليد ${data.total_count} كود بقيمة $${data.total_value}`, 'success');
+    toast(`✅ تم توليد ${data.total_count} كود بقيمة ${riyal(data.total_value)}`, 'success');
     loadVouchers();
   } catch (e) {
     toast('❌ خطأ في الاتصال', 'error');
@@ -1631,7 +1673,7 @@ async function loadVouchers(btn) {
       <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700"><div class="text-[10px] text-slate-400">غير مستخدمة</div><div class="text-lg font-bold text-emerald-400">${s.unused}</div></div>
       <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700"><div class="text-[10px] text-slate-400">مستخدمة</div><div class="text-lg font-bold text-blue-400">${s.used}</div></div>
       <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700"><div class="text-[10px] text-slate-400">موحّدة</div><div class="text-lg font-bold text-amber-400">${s.merged ?? 0}</div></div>
-      <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700"><div class="text-[10px] text-slate-400">قيمة غير مستخدمة</div><div class="text-lg font-bold text-amber-400">$${s.total_value_unused.toFixed(2)}</div></div>
+      <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700"><div class="text-[10px] text-slate-400">قيمة غير مستخدمة</div><div class="text-lg font-bold text-amber-400">${riyal(s.total_value_unused)}</div></div>
     `;
 
     const tbody = document.getElementById('vouchers-tbody');
@@ -1644,6 +1686,8 @@ async function loadVouchers(btn) {
       const statusBadge = {
         unused: '<span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full text-[10px] font-bold">غير مستخدم</span>',
         used: '<span class="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full text-[10px] font-bold">مستخدم</span>',
+        reserved: '<span class="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full text-[10px] font-bold">محجوز مؤقتًا</span>',
+        retry: `<span class="bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded-full text-[10px] font-bold">محاولة (${v.attempts || 1}) — لم تصل SMS</span>`,
         expired: '<span class="bg-slate-500/20 text-slate-400 px-2 py-0.5 rounded-full text-[10px] font-bold">منتهي</span>',
         disabled: '<span class="bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full text-[10px] font-bold">معطّل</span>',
       }[v.status] || v.status;
@@ -1672,7 +1716,7 @@ async function loadVouchers(btn) {
         <tr class="hover:bg-slate-700/30 transition-colors">
           <td class="px-3 py-2"><code class="mono text-[11px] bg-slate-900 px-2 py-0.5 rounded">${escapeHtml(v.code)}</code></td>
           <td class="px-3 py-2 text-slate-300 text-[11px]">${escapeHtml(v.label || '—')}</td>
-          <td class="px-3 py-2 font-bold text-amber-400">$${v.value.toFixed(2)}</td>
+          <td class="px-3 py-2 font-bold text-amber-400">${riyal(v.value)}</td>
           <td class="px-3 py-2">${cs}${usedOn}</td>
           <td class="px-3 py-2">${statusBadge}</td>
           <td class="px-3 py-2 text-slate-500 text-[10px]">${date}</td>
@@ -1681,7 +1725,7 @@ async function loadVouchers(btn) {
                     class="text-[10px] font-bold text-cyan-400 hover:text-cyan-300 border border-cyan-500/30 hover:border-cyan-500 px-2 py-1 rounded-lg transition-colors">📋 نسخ</button>
           </td>
           <td class="px-3 py-2">
-            ${v.status === 'unused' ? `<button onclick="disableVoucher(${v.id})" class="text-[10px] font-bold text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-500 px-2 py-1 rounded-lg transition-colors">تعطيل</button>` : ''}
+            ${(v.status === 'unused' || v.status === 'retry') ? `<button onclick="disableVoucher(${v.id})" class="text-[10px] font-bold text-red-400 hover:text-red-300 border border-red-500/30 hover:border-red-500 px-2 py-1 rounded-lg transition-colors">تعطيل</button>` : ''}
           </td>
         </tr>
       `;
@@ -1730,11 +1774,11 @@ let USED_SEARCH = '';
 async function loadUsedVouchers(btn) {
   if (btn) btn.disabled = true;
   try {
-    const r = await adminFetch('/api/v1/admin/vouchers/used');
+    const r = await adminFetch('/api/v1/admin/vouchers');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
-    USED_VOUCHERS = data.vouchers || [];
-    const s = data.summary;
+    USED_VOUCHERS = (data.vouchers || []).filter(v=>['used','retry'].includes(v.status)).sort((a,b)=>new Date(b.used_at||b.status_updated_at||b.created_at)-new Date(a.used_at||a.status_updated_at||a.created_at));
+    const s = {total_used:USED_VOUCHERS.length,total_value:USED_VOUCHERS.filter(v=>v.status==='used').reduce((sum,v)=>sum+Number(v.value||0),0)};
 
     const lastUsed = USED_VOUCHERS[0]?.used_at
       ? new Date(USED_VOUCHERS[0].used_at).toLocaleString('ar-EG')
@@ -1742,15 +1786,15 @@ async function loadUsedVouchers(btn) {
 
     document.getElementById('used-summary').innerHTML = `
       <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700">
-        <div class="text-[10px] text-slate-400">عدد الأكواد المستخدمة</div>
+        <div class="text-[10px] text-slate-400">الأكواد المستخدمة والمحاولات</div>
         <div class="text-lg font-bold text-emerald-400">${s.total_used}</div>
       </div>
       <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700">
-        <div class="text-[10px] text-slate-400">إجمالي القيمة</div>
-        <div class="text-lg font-bold text-amber-400">$${s.total_value.toFixed(2)}</div>
+        <div class="text-[10px] text-slate-400">قيمة الأكواد المستخدمة (ليست مبيعات سلة)</div>
+        <div class="text-lg font-bold text-amber-400">${riyal(s.total_value)}</div>
       </div>
       <div class="bg-slate-900/50 rounded-xl p-3 border border-slate-700">
-        <div class="text-[10px] text-slate-400">آخر استخدام</div>
+        <div class="text-[10px] text-slate-400">آخر تحديث مسجل</div>
         <div class="text-[11px] font-bold text-slate-300">${lastUsed}</div>
       </div>
     `;
@@ -1811,9 +1855,9 @@ function renderUsedVouchers() {
           <button onclick="copyOneCode('${safeCode}')" class="text-[10px] text-cyan-400 hover:text-cyan-300 ml-1">📋</button>
         </td>
         <td class="px-3 py-2 text-slate-300 text-[11px]">${escapeHtml(v.label || '—')}</td>
-        <td class="px-3 py-2 font-bold text-amber-400">$${v.value.toFixed(2)}</td>
+        <td class="px-3 py-2 font-bold text-amber-400">${riyal(v.value)}</td>
         <td class="px-3 py-2">${usedOnHtml}</td>
-        <td class="px-3 py-2 text-slate-500 text-[10px]">${usedAt}</td>
+        <td class="px-3 py-2 text-slate-500 text-[10px]">${usedAt} ${v.status==='retry'?' · محاولة ('+Number(v.attempts||1)+')':' · مستخدم'}</td>
       </tr>
     `;
   }).join('');
@@ -1822,7 +1866,7 @@ function renderUsedVouchers() {
 // ══════════════════════════════════════════════════════════════
 // Listeners
 // ══════════════════════════════════════════════════════════════
-['v-value', 'v-count'].forEach(id => {
+['v-value', 'v-count', 'salla-sale-price', 'salla-payment-method'].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener('input', () => {
     updateModePreviews();
@@ -1832,11 +1876,71 @@ function renderUsedVouchers() {
 
 // ══════════════════════════════════════════════════════════════
 // Bootstrap
+// ===== رمزون: العرض بالريال وأقسام الإدارة =====
+let EXCHANGE_FACTOR = 3.95;
+function riyal(usd) { return (Number(usd || 0) * EXCHANGE_FACTOR).toLocaleString('ar-SA',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' ر.س'; }
+function saveExchangeFactor(){
+  const n=Number(document.getElementById('exchange-factor').value);
+  if(!Number.isFinite(n)||n<=0||n>100){toast('أدخل معاملًا صحيحًا','error');return;}
+  EXCHANGE_FACTOR=n;
+  localStorage.setItem('ramzon_admin_exchange',String(n));
+  toast('تم حفظ معامل العرض في هذا المتصفح','success');
+  loadAll(); if(CATALOG.ok) {renderTree();updateMeta();updateFinancialInfo();}
+}
+function setupAdminSections() {
+  const saved=Number(localStorage.getItem('ramzon_admin_exchange'));
+  if(saved>0&&saved<=100) EXCHANGE_FACTOR=saved;
+  document.getElementById('exchange-factor').value=EXCHANGE_FACTOR;
+  const main=document.getElementById('ramzon-main');
+  const sections=Array.from(document.querySelectorAll('#ramzon-dynamic-pages ~ section'));
+  const keys=['home','generate','popular','pricing','codes','codes'];
+  sections.forEach((node,i)=>{
+    node.classList.add('ramzon-page');
+    node.dataset.ramzonPage=keys[i]||'home';
+    main.appendChild(node);
+  });
+  const footer=main.querySelector('footer'); if(footer) footer.remove();
+  document.getElementById('v-filter').value='unused';
+  document.querySelectorAll('#ramzon-nav button').forEach(b=>b.addEventListener('click',()=>showAdminPage(b.dataset.page)));
+  showAdminPage('home');
+}
+function showAdminPage(page){
+  document.querySelectorAll('.ramzon-page').forEach(el=>{
+    const key=el.dataset.ramzonPage || el.id.replace('ramzon-','');
+    el.classList.toggle('hidden',key!==page);
+  });
+  document.querySelectorAll('#ramzon-nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+async function loadDashboard(){
+  try{
+    const r=await adminFetch('/api/v1/admin/vouchers');
+    if(!r.ok) return;
+    const d=await r.json(), all=d.vouchers||[];
+    const now=new Date();
+    const month=all.filter(v=>{
+      const date=new Date(v.used_at||v.status_updated_at||(v.status_events||[]).at(-1)?.at||v.created_at||0);
+      return date.getMonth()===now.getMonth()&&date.getFullYear()===now.getFullYear();
+    });
+    const stats=[
+      ['🆕 الأكواد الجديدة',all.filter(v=>v.status==='unused').length],
+      ['✅ مستخدمة هذا الشهر',month.filter(v=>v.status==='used').length],
+      ['🔄 محاولات هذا الشهر',month.filter(v=>v.status==='retry').length],
+      ['⏳ محجوزة مؤقتًا',all.filter(v=>v.status==='reserved').length],
+    ];
+    document.getElementById('dashboard-stats').innerHTML=stats.map(([label,n])=>`<div class="bg-slate-800 border border-slate-700 rounded-xl p-4"><div class="text-xs text-slate-400">${label}</div><div class="text-2xl font-black mt-2">${n}</div></div>`).join('');
+    const statuses={used:'مستخدم',retry:'محاولة',reserved:'محجوز مؤقتًا',unused:'جديد',expired:'منتهي',disabled:'معطل'};
+    const events=all.flatMap(v=>Array.isArray(v.status_events)&&v.status_events.length?v.status_events.map(e=>({...e,code:v.code})):(v.status!=='unused'?[{code:v.code,status:v.status,at:v.used_at||v.status_updated_at||v.created_at,attempts:v.attempts}]:[])).sort((a,b)=>new Date(b.at||0)-new Date(a.at||0));
+    document.getElementById('status-history').innerHTML=events.length?`<table class="w-full text-xs"><thead><tr><th class="p-2">الكود</th><th class="p-2">الحالة</th><th class="p-2">التاريخ</th></tr></thead><tbody>${events.slice(0,500).map(v=>`<tr class="border-t border-slate-700"><td class="p-2 mono">${escapeHtml(v.code)}</td><td class="p-2">${statuses[v.status]||escapeHtml(v.status)} ${v.status==='retry'?'('+Number(v.attempts||1)+')':''}</td><td class="p-2">${new Date(v.at).toLocaleString('ar-SA')}</td></tr>`).join('')}</tbody></table>`:'لا توجد سجلات';
+  }catch(e){console.error(e)}
+}
 // ══════════════════════════════════════════════════════════════
+setupAdminSections();
 loadAll();
 loadCatalog();
 loadPopular();
-setInterval(loadAll, 30000);
+loadDashboard();
+setInterval(()=>{loadAll();loadDashboard();}, 30000);
 setInterval(() => loadCatalog(true), 5 * 60 * 1000);
 </script>
 </body>

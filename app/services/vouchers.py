@@ -81,6 +81,8 @@ def create_vouchers_batch(
             "used_by": None,
             "used_at": None,
             "used_on": None,
+            "attempts": 0,
+            "reserved_order_id": None,
         }
         STORE["vouchers"].append(voucher)
         created.append(voucher)
@@ -94,6 +96,8 @@ def validate_voucher(code: str) -> dict:
     if not v:
         raise HTTPException(404, "كود غير موجود")
 
+    if v["status"] == "reserved":
+        raise HTTPException(409, "الكود محجوز مؤقتًا لرقم في انتظار SMS")
     if v["status"] == "used":
         raise HTTPException(400, "الكود مستخدم مسبقاً")
     if v["status"] == "disabled":

@@ -94,12 +94,13 @@
       display:none; align-items:center; justify-content:center;
       padding:16px; animation:fadeIn .2s;
     }
-    .modal-overlay.open { display:flex; }
+    .modal-overlay.open { display:flex; overflow-y:auto; overscroll-behavior:contain; align-items:safe center; }
     @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
     .modal-box {
       background:#fff; border:1px solid #e2e8f0;
       border-radius:20px; width:100%; max-width:560px;
-      max-height:88vh; overflow-y:auto;
+      max-height:calc(100dvh - 28px); overflow-y:auto;
+      overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
       animation:modalIn .25s cubic-bezier(.2,.9,.3,1.1);
     }
     @keyframes modalIn {
@@ -317,6 +318,8 @@
       background: #059669;
     }
 
+    .voucher-denied { display:none !important; }
+    [hidden] { display:none !important; }
     /* SMS screen follows Rival Store visual identity */
     .sms-timer-head .time,.sms-code-display .code-text { color:#951e32; }
     .sms-timer-bar { background:linear-gradient(90deg,#951e32,#d17b9b); }
@@ -325,6 +328,19 @@
     .sms-code-display .copy-btn:hover { background:#641222; }
     #smsChangeNumberBtn button { background:#951e32; }
     #smsChangeNumberBtn button:hover { background:#641222; }
+
+    /* 안내/إرشاد النسخ يتبدل مع وصول أول رسالة فعلية */
+    .ramzon-copy-guide { display:flex; width:100%; align-items:center; justify-content:center; gap:10px;
+      border:1px solid #e5a8b4; background:#fff4f6; color:#951e32; border-radius:12px;
+      font-size:13px; font-weight:800; padding:11px 14px; margin:4px 0 14px; cursor:pointer;
+      text-align:center; transition:background .2s ease; }
+    .ramzon-copy-guide:hover, .ramzon-copy-guide:focus-visible {background:#ffe9ee; outline:2px solid #bd5d73; outline-offset:2px;}
+    .ramzon-copy-guide .ramzon-guide-icon {display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px;
+      border-radius:50%; background:#951e32; color:white; font-size:15px; flex-shrink:0;}
+    .ramzon-copy-guide.ramzon-guide-ready {border-color:#7bcdb0;background:#edfdf5;color:#067647;}
+    .ramzon-copy-guide.ramzon-guide-ready .ramzon-guide-icon {background:#067647;}
+    @media (prefers-reduced-motion:no-preference) {.ramzon-copy-guide .ramzon-guide-icon {animation:ramzonGuidePulse 2s ease-in-out infinite;}}
+    @keyframes ramzonGuidePulse {50% {box-shadow:0 0 0 6px rgba(149,30,50,.10);}}
   </style>
 </head>
 <body>
@@ -362,21 +378,7 @@
         </span>
         <span class="hud-label">شراء كود</span>
       </a>
-
-      <!-- 📱 شراء رقم -->
-      <button type="button" onclick="scrollToBuy()"
-              class="hud-chip buy"
-              aria-label="شراء رقم" title="شراء رقم">
-        <span class="ico" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="6" y="2" width="12" height="20" rx="2.5"/>
-            <path d="M11 18h2"/>
-          </svg>
-        </span>
-        <span class="hud-label">شراء رقم</span>
-      </button>
-
-      <!-- 🔍 تحقق -->
+<!-- 🔍 تحقق -->
       <button type="button" onclick="openModal('verifyCodeModal')"
               class="hud-chip verify"
               aria-label="التحقق من الأكواد" title="التحقق من الأكواد">
@@ -395,12 +397,23 @@
 
   <main class="main-area">
     <div class="max-w-5xl mx-auto px-3 md:px-5">
+      <section class="bg-white rounded-2xl border border-rose-100 shadow-sm p-5 mb-5" aria-labelledby="voucher-heading" id="voucher-entry">
+        <h2 id="voucher-heading" class="font-black text-slate-800 text-lg mb-2">🎟️ ضع الكود هنا</h2>
+        <p class="text-sm text-slate-500 mb-3">تحقق من كود الشراء لعرض الدول والبرامج التي يسمح لك باستخدامها.</p>
+        <form onsubmit="event.preventDefault(); verifyAndShowCatalog();" class="flex flex-col sm:flex-row gap-2">
+          <input id="entryVoucherCode" type="text" autocomplete="off" spellcheck="false" dir="ltr"
+                 aria-label="كود الشراء" placeholder="ضع الكود هنا"
+                 class="glass !bg-white flex-1 font-bold uppercase" oninput="onEntryVoucherChange()">
+          <button type="submit" id="entryVoucherButton" class="bg-rose-800 hover:bg-rose-900 text-white px-6 py-3 rounded-xl font-bold">تحقق من الكود</button>
+        </form>
+        <p id="entryVoucherResult" role="status" aria-live="polite" class="mt-3 text-sm text-slate-500">أدخل كودك لعرض الخيارات المسموحة.</p>
+      </section>
 
       {% if not prices_meta.ok %}
       <div class="max-w-2xl mx-auto mt-8">
         <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-8 text-center">
           <div class="text-5xl mb-4">⚠️</div>
-          <h2 class="text-xl font-bold text-red-800 mb-3">تعذّر تحميل البيانات من 5SIM</h2>
+          <h2 class="text-xl font-bold text-red-800 mb-3">تعذّر تحميل بيانات الأرقام</h2>
           <p class="text-sm text-red-700 mb-2">{{ prices_meta.error or 'خطأ غير معروف' }}</p>
           {% if prices_meta.error_code %}
             <p class="text-xs text-red-500 mb-4" dir="ltr">HTTP {{ prices_meta.error_code }}</p>
@@ -417,7 +430,7 @@
         <div class="flex items-center gap-2 flex-wrap">
           <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[11px] font-bold px-2.5 py-1 rounded-full">
             <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-            بيانات حية من 5SIM
+            الخيارات المتاحة حاليًا
           </span>
         </div>
         <button type="button" onclick="refreshPrices(this)"
@@ -428,7 +441,7 @@
 
       {# ══ الأكثر طلباً ══ #}
       {% if popular_services %}
-      <div class="mb-6" id="popular-section">
+      <div class="mb-6" id="popular-section" hidden>
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <div class="w-1.5 h-5 bg-gradient-to-b from-orange-400 to-red-500 rounded-full"></div>
@@ -441,6 +454,7 @@
           <button type="button"
                   data-popular-item
                   data-service-id="{{ p.service_id }}"
+                  data-country-slug="{{ p.country_slug }}"
                   data-popular-index="{{ loop.index0 }}"
                   onclick="quickBuy('{{ p.country_slug }}', '{{ p.service_id }}')"
                   class="group relative bg-white rounded-2xl shadow-sm border border-slate-100 hover:border-rose-400 hover:shadow-md transition-all p-3 text-right overflow-hidden {% if loop.index > 6 %}hidden{% endif %}">
@@ -480,7 +494,7 @@
       </div>
       {% endif %}
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="catalog-content" hidden>
         <div class="lg:col-span-2 space-y-4">
 
           {# ══ الخطوة 1: البرامج ══ #}
@@ -515,7 +529,7 @@
             <div class="flex items-center gap-3 mb-4">
               <div class="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">2</div>
               <h3 class="text-base font-bold text-slate-800">اختر الدولة</h3>
-              <span class="text-[10px] text-slate-400">{{ countries|length }} دولة متاحة من 5SIM</span>
+              <span class="text-[10px] text-slate-400">{{ countries|length }} دولة متاحة</span>
             </div>
 
             <div class="relative mb-3">
@@ -583,23 +597,10 @@
               </div>
             </div>
 
-            <div class="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-3 mb-4">
-              <div class="flex items-center gap-2 mb-2">
-                <span class="text-lg">🎟️</span>
-                <span class="text-xs font-bold text-amber-900">كود الشراء</span>
-              </div>
-              <div class="flex gap-2">
-                <input type="text" id="orderVoucherCode"
-                       placeholder="ضع كودك الذي استلمته من متجر رايفل هنا"
-                       class="glass !bg-white uppercase flex-1 text-xs"
-                       dir="rtl"
-                       onkeydown="if(event.key==='Enter'){event.preventDefault();checkOrderVoucher();}">
-                <button type="button" onclick="checkOrderVoucher()"
-                        class="bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs px-3 rounded-lg whitespace-nowrap">
-                  🔍 تحقق
-                </button>
-              </div>
-              <p id="orderVoucherMsg" class="text-[11px] text-amber-800 mt-1.5"></p>
+            <div class="bg-rose-50 border border-rose-200 rounded-xl p-3 mb-4">
+              <span class="text-xs font-bold text-rose-900">🎟️ الكود الذي تم التحقق منه</span>
+              <input id="orderVoucherCode" readonly type="text" dir="ltr" class="glass !bg-white mt-2 w-full text-center font-bold" placeholder="أدخل الكود أعلى الصفحة أولًا">
+              <p id="orderVoucherMsg" class="text-xs text-slate-500 mt-2">الاختيارات محددة حسب صلاحيات الكود.</p>
             </div>
 
             <button onclick="confirmPurchase()" id="buy-btn"
@@ -679,6 +680,13 @@
         <button onclick="closeModal('smsCodeModal')" class="text-slate-400 hover:text-slate-600 text-xl">✕</button>
       </div>
 
+      <!-- دليل واضح: الرقم أولًا، وأحدث كود عند وصول SMS موثّق -->
+      <button id="ramzonCopyGuide" type="button" class="ramzon-copy-guide" aria-live="polite"
+              onclick="ramzonCopyHighlightedValue()" aria-label="الرقم المطلوب هنا، اضغط لنسخه">
+        <span id="ramzonGuideIcon" class="ramzon-guide-icon" aria-hidden="true">📱</span>
+        <span id="ramzonGuideLabel">الرقم المطلوب هنا — اضغط لنسخه</span>
+      </button>
+
       <!-- الرقم الحالي -->
       <div class="mb-4">
         <div class="flex justify-between items-center mb-1">
@@ -742,11 +750,14 @@
         </button>
       </div>
 
-      <!-- زر تغيير الرقم -->
-      <div id="smsChangeNumberBtn" class="hidden mt-4">
+      <div class="mt-3 text-center text-xs text-slate-500 leading-relaxed">
+        إذا لم تصلك الرسالة بعد 5 دقائق، يُنصح باستبدال الرقم.
+      </div>
+      <!-- زر استبدال الرقم -->
+      <div id="smsChangeNumberBtn" class="mt-3">
         <button type="button" onclick="changeCurrentNumber()"
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
-          🔄 تغيير الرقم
+          🔄 استبدال الرقم
         </button>
       </div>
 
@@ -1015,6 +1026,93 @@
     }
   }
 
+  // Code restrictions are display-only; the server independently verifies each purchase.
+  let verifiedVoucher = null;
+  let voucherRequestSequence = 0;
+  function voucherAllowsPair(country, serviceId) {
+    if (!verifiedVoucher) return false;
+    const pairs = verifiedVoucher.allowed_pairs || [];
+    if (pairs.length === 0) return true; // unrestricted valid voucher
+    const c = String(country?.slug || country || '').toLowerCase();
+    const cc = String(country?.code || '').toLowerCase();
+    const id = String(serviceId || '').toLowerCase();
+    return pairs.some(p => (String(p.country).toLowerCase() === c || String(p.country).toLowerCase() === cc) && String(p.service).toLowerCase() === id);
+  }
+  function voucherAllowsCountry(c) {
+    return (c.services || []).some(s => voucherAllowsPair(c, s.id));
+  }
+  function voucherAllowsService(id) {
+    return COUNTRIES.some(c => voucherAllowsPair(c, id));
+  }
+  function onEntryVoucherChange() {
+    voucherRequestSequence++;
+    verifiedVoucher = null;
+    selectedCountry = null;
+    selectedService = null;
+    currentCount = 0;
+    const checkoutCode = document.getElementById('orderVoucherCode');
+    if (checkoutCode) checkoutCode.value = '';
+    const box = document.getElementById('catalog-content');
+    if (box) box.hidden = true;
+    const popular = document.getElementById('popular-section');
+    if (popular) popular.hidden = true;
+    const msg = document.getElementById('entryVoucherResult');
+    if (msg) { msg.textContent = 'اضغط «تحقق من الكود» لعرض الخيارات المسموحة.'; msg.className='mt-3 text-sm text-slate-500'; }
+  }
+  async function verifyAndShowCatalog() {
+    const code = (document.getElementById('entryVoucherCode')?.value || '').trim().toUpperCase();
+    const result = document.getElementById('entryVoucherResult');
+    const button = document.getElementById('entryVoucherButton');
+    if (!code) { result.textContent='الرجاء إدخال الكود أولًا.'; return; }
+    const sequence = ++voucherRequestSequence;
+    verifiedVoucher = null;
+    button.disabled = true;
+    result.textContent = 'جارٍ التحقق من الكود...';
+    try {
+      const response = await fetch('/api/v1/vouchers/check', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({code})
+      });
+      const data = await response.json();
+      if (sequence !== voucherRequestSequence) return;
+      if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'الكود غير صالح');
+      verifiedVoucher = {code, allowed_pairs:Array.isArray(data.allowed_pairs) ? data.allowed_pairs : []};
+      const matchingCountries = COUNTRIES.filter(c => voucherAllowsCountry(c));
+      const matchingPrograms = ALL_SERVICES.filter(s => voucherAllowsService(s.id));
+      const checkoutCode = document.getElementById('orderVoucherCode');
+      if (checkoutCode) checkoutCode.value = code;
+      const catalog = document.getElementById('catalog-content');
+      if (catalog) catalog.hidden = false;
+      const popular = document.getElementById('popular-section');
+      if (popular) popular.hidden = false;
+      // Limit both pickers and the popular shortcuts to pairs allowed by this code.
+      let allowedCountryIndex = 0;
+      document.querySelectorAll('.country-btn').forEach(b => {
+        const c = COUNTRIES.find(x => x.slug === b.dataset.slug);
+        const permitted = !!c && voucherAllowsCountry(c);
+        b.classList.toggle('voucher-denied', !permitted);
+        b.dataset.countryIndex = permitted ? String(allowedCountryIndex++) : '999999';
+      });
+      const countryMore = document.getElementById('country-more-wrap');
+      if (countryMore) {
+        countryMore.hidden = allowedCountryIndex <= PREVIEW_COUNT;
+        const toggle = countryMore.querySelector('button');
+        if (toggle) { toggle.dataset.expanded='false'; toggle.querySelector('.label').textContent = 'عرض المزيد ('+(allowedCountryIndex-PREVIEW_COUNT)+')'; }
+      }
+      document.querySelectorAll('[data-popular-item]').forEach(b => {
+        b.classList.toggle('voucher-denied', !voucherAllowsPair(b.dataset.countrySlug, b.dataset.serviceId));
+      });
+      selectedCountry = null; selectedService = null; currentCount = 0;
+      renderServices(); refreshSelection();
+      filterCountries(''); filterServices('');
+      result.textContent = `✅ الكود صالح. الدول المسموحة: ${matchingCountries.length}، البرامج المسموحة: ${matchingPrograms.length}. اختر البرنامج والدولة لإكمال الطلب.`;
+      result.className='mt-3 text-sm text-emerald-700 font-bold';
+    } catch (error) {
+      if (sequence !== voucherRequestSequence) return;
+      result.textContent='❌ ' + (error.message || 'تعذر التحقق من الكود');
+      result.className='mt-3 text-sm text-red-700 font-bold';
+    } finally { if (sequence === voucherRequestSequence) button.disabled = false; }
+  }
+
   // ══════════════════════════════════════════════════════════
   // Country / Service selection
   // ══════════════════════════════════════════════════════════
@@ -1041,7 +1139,7 @@
     const matching = getAvailability(selectedCountry, selectedService && selectedService.id);
     currentCount = matching && matching.available ? Number(matching.count || 0) : 0;
     const confirm = document.getElementById('confirm-step');
-    const canBuy = Boolean(selectedCountry && selectedService && currentCount > 0);
+    const canBuy = Boolean(verifiedVoucher && selectedCountry && selectedService && voucherAllowsPair(selectedCountry,selectedService.id) && currentCount > 0);
     confirm.classList.toggle('opacity-50', !canBuy);
     confirm.classList.toggle('pointer-events-none', !canBuy);
     document.querySelectorAll('.country-btn').forEach(b => {
@@ -1053,6 +1151,8 @@
   }
 
   function selectCountry(slug, btn) {
+    const candidate=COUNTRIES.find(c => c.slug===slug);
+    if (!voucherAllowsCountry(candidate || {})) return;
     document.querySelectorAll('.country-btn').forEach(b => {
       b.classList.remove('border-blue-500','bg-blue-50'); b.classList.add('border-slate-100');
     });
@@ -1071,10 +1171,10 @@
     const term = document.getElementById('serviceSearch')?.value || '';
     grid.innerHTML = ''; moreWrap.classList.add('hidden'); moreWrap.innerHTML = '';
     empty.classList.toggle('hidden', ALL_SERVICES.length > 0);
-    const sorted = sortByPopularity(ALL_SERVICES, s => s.id);
+    const sorted = sortByPopularity(ALL_SERVICES.filter(s => voucherAllowsService(s.id)), s => s.id);
     sorted.forEach((s, idx) => {
       const matching = getAvailability(selectedCountry, s.id);
-      const available = selectedCountry ? Boolean(matching && matching.available && Number(matching.count)>0) : Boolean(s.available);
+      const available = selectedCountry ? Boolean(voucherAllowsPair(selectedCountry,s.id) && matching && matching.available && Number(matching.count)>0) : Boolean(s.available);
       const shownCount = selectedCountry ? Number(matching?.count || 0) : Number(s.count || 0);
       const btn = document.createElement('button');
       btn.type = 'button'; btn.dataset.id = s.id; btn.dataset.serviceIndex = idx;
@@ -1130,6 +1230,7 @@
   function toggleServices(btn) { toggleMore(btn, '.service-btn', 'serviceIndex'); }
 
   function selectService(id, count, btn) {
+    if (!voucherAllowsService(id) || (selectedCountry && !voucherAllowsPair(selectedCountry,id))) { showAlert('هذا البرنامج غير مسموح به لهذا الكود','error'); return; }
     document.querySelectorAll('.service-btn').forEach(b => {
       b.classList.remove('border-blue-500','bg-blue-50'); b.classList.add('border-slate-100');
     });
@@ -1313,12 +1414,13 @@
   // Purchase flow
   // ══════════════════════════════════════════════════════════
   async function confirmPurchase() {
+    if (!verifiedVoucher || !selectedCountry || !selectedService || !voucherAllowsPair(selectedCountry,selectedService.id)) { showAlert('تحقق من الكود واختر أحد الخيارات المسموحة', 'error'); return; }
     if (!selectedCountry || !selectedService) {
       showAlert('اختر الدولة والخدمة أولاً', 'error');
       return;
     }
 
-    const voucherCode = (document.getElementById('orderVoucherCode')?.value || '').trim().toUpperCase();
+    const voucherCode = verifiedVoucher.code;
 
     if (GUEST_REQUIRES_VOUCHER && !voucherCode) {
       showAlert('أدخل كود الشراء أولاً', 'error');
@@ -1341,6 +1443,7 @@
       const d = await r.json();
       if (r.ok) {
         CURRENT_ORDER = d;
+        try { sessionStorage.setItem('ramzon_active_order', JSON.stringify(d)); } catch (_) {}
         showPurchaseResult(d);
         btn.disabled = false; btn.innerHTML = original;
       } else {
@@ -1411,6 +1514,7 @@
       if (r.ok) {
         document.getElementById('pr-actions').classList.add('hidden');
         document.getElementById('pr-cancelled').classList.remove('hidden');
+        try { sessionStorage.removeItem('ramzon_active_order'); } catch (_) {}
         if (window._waitTimer) { clearInterval(window._waitTimer); window._waitTimer = null; }
       } else {
         const d = await r.json();
@@ -1457,17 +1561,51 @@
   // SMS Modal — النظام الكامل
   // ══════════════════════════════════════════════════════════
   let smsTimerInterval = null;
-  let smsSecondsLeft = 1200; // 20 دقيقة
+  let smsSecondsLeft = 1200;
+  let smsTimerTotal = 1200;
+  let smsDeadline = null;
   let smsCodeReceived = false;
   let smsReceivedCodes = [];
   let smsPollingInterval = null;
+
+  // حالة دليل النسخ محلية للنافذة، ولا تُعلن وصول SMS إلا بعد بيانات فعلية من الخادم.
+  function ramzonUpdateCopyGuide(code = '') {
+    const guide = document.getElementById('ramzonCopyGuide');
+    const icon = document.getElementById('ramzonGuideIcon');
+    const label = document.getElementById('ramzonGuideLabel');
+    if (!guide || !icon || !label) return;
+    const hasCode = Boolean(String(code || '').trim());
+    guide.classList.toggle('ramzon-guide-ready', hasCode);
+    icon.textContent = hasCode ? '📩' : '📱';
+    label.textContent = hasCode ? 'انسخ الكود من هنا' : 'الرقم المطلوب هنا — اضغط لنسخه';
+    guide.setAttribute('aria-label', hasCode ? 'انسخ أحدث كود استلمته من هنا' : 'الرقم المطلوب هنا، اضغط لنسخه');
+  }
+
+  function ramzonCopyHighlightedValue() {
+    const lastCode = smsReceivedCodes.length ? smsReceivedCodes[smsReceivedCodes.length - 1] : '';
+    if (lastCode) {
+      const codeElements = document.querySelectorAll('#smsCodesContainer .sms-code-display');
+      const latest = codeElements[codeElements.length - 1];
+      if (latest) latest.scrollIntoView({block:'nearest',behavior:'smooth'});
+      copySmsCode(lastCode, false);
+    } else {
+      const phoneInput = document.getElementById('displayPhoneNumber');
+      if (phoneInput) phoneInput.scrollIntoView({block:'nearest',behavior:'smooth'});
+      copyPhoneFromSmsModal();
+    }
+  }
 
   function openSmsModal(phone) {
     cleanupSmsModal();
     smsApiUnavailableNotified = false;
     smsCodeReceived = false;
     smsReceivedCodes = [];
-    smsSecondsLeft = 1200;
+    ramzonUpdateCopyGuide();
+    const expiryMs = Date.parse(CURRENT_ORDER?.expires || '');
+    const validExpiry = Number.isFinite(expiryMs) && expiryMs > 0;
+    smsDeadline = validExpiry ? expiryMs : Date.now() + 20 * 60 * 1000;
+    smsSecondsLeft = Math.max(0, Math.ceil((smsDeadline - Date.now()) / 1000));
+    smsTimerTotal = Math.max(1, smsSecondsLeft);
 
     document.getElementById('displayPhoneNumber').value = phone || '—';
     document.getElementById('smsCodesContainer').innerHTML = '';
@@ -1480,14 +1618,14 @@
       <p class="text-[11px] text-slate-400 mt-2">لا يمكن الإلغاء أو الاسترجاع بعد استلام الكود</p>
     `;
     document.getElementById('smsActionButtons').classList.remove('hidden');
-    document.getElementById('smsChangeNumberBtn').classList.add('hidden');
+    document.getElementById('smsChangeNumberBtn').classList.remove('hidden');
     document.getElementById('smsCloseBtn').classList.add('hidden');
     document.getElementById('smsTimerWrap').classList.remove('hidden');
 
     updateSmsTimerDisplay();
     if (smsTimerInterval) clearInterval(smsTimerInterval);
     smsTimerInterval = setInterval(() => {
-      smsSecondsLeft--;
+      smsSecondsLeft = Math.max(0, Math.ceil((smsDeadline - Date.now()) / 1000));
       updateSmsTimerDisplay();
       if (smsSecondsLeft <= 0) {
         clearInterval(smsTimerInterval);
@@ -1507,7 +1645,7 @@
     const bar = document.getElementById('smsTimerBar');
     if (txt) txt.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     if (bar) {
-      const percent = (Math.max(0, smsSecondsLeft) / 1200) * 100;
+      const percent = (Math.max(0, smsSecondsLeft) / smsTimerTotal) * 100;
       bar.style.width = `${percent}%`;
       bar.classList.remove('warning', 'danger');
       if (percent <= 20) bar.classList.add('danger');
@@ -1524,7 +1662,7 @@
           <div class="inline-flex items-center gap-2 bg-red-50 text-red-700 border border-red-200 rounded-xl px-4 py-3 text-sm font-bold">
             ⏰ انتهى وقت الانتظار
           </div>
-          <p class="text-[11px] text-slate-400 mt-2">لم يصل الكود خلال 20 دقيقة</p>
+          <p class="text-[11px] text-slate-400 mt-2">انتهت مدة الرقم لدى المورد. قد يلزم انتظار تسوية الطلب قبل إعادة استخدام الكود.</p>
         </div>
       `;
       document.getElementById('smsActionButtons').classList.add('hidden');
@@ -1533,21 +1671,21 @@
   }
 
   // Query the application's authenticated backend only. Never fabricate received SMS.
-  // Backend must implement GET /api/v1/orders/{id}/sms and enforce ownership.
+  // Authenticated supplier status endpoint; no synthetic SMS is generated.
   let smsPollingBusy = false;
   let smsApiUnavailableNotified = false;
   async function fetchSmsStatus() {
     if (smsPollingBusy || !CURRENT_ORDER?.id) return;
     smsPollingBusy = true;
     try {
-      const response = await fetch(`/api/v1/orders/${encodeURIComponent(CURRENT_ORDER.id)}/sms`, {
+      const response = await fetch(`/api/v1/orders/${encodeURIComponent(CURRENT_ORDER.id)}/check`, {
         method: 'GET', credentials: 'same-origin', cache: 'no-store'
       });
       if (!response.ok) {
         if ([404,405,501].includes(response.status) && !smsApiUnavailableNotified) {
           smsApiUnavailableNotified = true;
           const waiting = document.getElementById('smsWaitingState');
-          if (waiting) waiting.textContent = 'استقبال SMS غير مربوط بخادم الموقع بعد. راجع المطور لتفعيل واجهة الرسائل.';
+          if (waiting) waiting.textContent = 'تعذّر العثور على الطلب. الرجاء التواصل مع خدمة العملاء.';
           cleanupSmsModal();
         }
         return;
@@ -1558,7 +1696,14 @@
                     Array.isArray(data.sms) ? data.sms : [];
       for (const entry of items) {
         const value = typeof entry === 'string' ? entry : (entry?.code || entry?.sms_code || '');
-        if (value) addSmsCode(String(value));
+        if (value) addSmsCode(String(value), typeof entry === 'object' ? entry.text : '');
+      }
+      if (data.voucher_status === 'retry' || ['CANCELED', 'CANCELLED', 'REFUNDED'].includes(data.status)) {
+        cleanupSmsModal();
+        try { sessionStorage.removeItem('ramzon_active_order'); } catch (_) {}
+        const waiting = document.getElementById('smsWaitingState');
+        if (waiting) { waiting.classList.remove('hidden'); waiting.textContent = 'لم تصل رسالة SMS، ويمكنك محاولة استخدام الكود مجددًا بعد تأكيد الإلغاء.'; }
+        document.getElementById('smsActionButtons').classList.add('hidden');
       }
     } catch (error) {
       // Connectivity errors are transient; polling can retry.
@@ -1572,10 +1717,11 @@
     smsPollingInterval = setInterval(fetchSmsStatus, 8000);
   }
 
-  function addSmsCode(code) {
+  function addSmsCode(code, smsText = '') {
     if (smsReceivedCodes.includes(code)) return;
     smsCodeReceived = true;
     smsReceivedCodes.push(code);
+    ramzonUpdateCopyGuide(code);
     if (smsTimerInterval) { clearInterval(smsTimerInterval); smsTimerInterval = null; }
 
     document.getElementById('smsWaitingState').classList.add('hidden');
@@ -1604,6 +1750,11 @@
     copyWithCountry.onclick = () => copySmsCode(code, true);
     actions.append(copy, copyWithCountry); codeEl.append(codeText, actions);
     container.appendChild(codeEl);
+    if (smsText) {
+      const msg = document.createElement('p');
+      msg.dir = 'auto'; msg.className = 'text-xs text-slate-700 bg-slate-50 border border-slate-100 rounded-lg p-3 my-2 whitespace-pre-wrap break-words';
+      msg.textContent = smsText; container.appendChild(msg);
+    }
   }
 
   // ✨ نسخ الكود — مع أو بدون كود الدولة
@@ -1659,10 +1810,11 @@
     document.getElementById('smsCompletedState').classList.remove('hidden');
     document.getElementById('smsCompletedState').innerHTML = `
       <div class="inline-flex items-center gap-2 bg-orange-50 text-orange-700 border border-orange-200 rounded-xl px-4 py-3 text-sm font-bold">
-        🚫 تم حظر الرقم — العداد متوقف
+        🚫 الرقم محظور — العداد متوقف
       </div>
     `;
-    showAlert('🚫 تم حظر الرقم', 'info');
+    try { sessionStorage.removeItem('ramzon_active_order'); } catch (_) {}
+    showAlert('🚫 الرقم محظور', 'info');
   }
 
   // ✨ إلغاء الرقم
@@ -1685,18 +1837,29 @@
       </div>
       <p class="text-[11px] text-slate-400 mt-2">سيتم استرجاع المبلغ</p>
     `;
+    try { sessionStorage.removeItem('ramzon_active_order'); } catch (_) {}
     showAlert('❌ تم إلغاء الرقم', 'info');
   }
 
-  // To avoid duplicate charges, changing a number returns to the existing checkout
-  // and requires a new explicit confirmation (including voucher validation).
-  function changeCurrentNumber() {
-    closeModal('smsCodeModal');
-    closeModal('purchaseResultModal');
-    CURRENT_ORDER = null;
-    const confirm = document.getElementById('confirm-step');
-    if (confirm) confirm.scrollIntoView({behavior:'smooth',block:'center'});
-    showAlert('تحقق من كود الشراء ثم أكد طلب الرقم الجديد', 'info');
+  // Cancel the old reservation server-side before allowing a fresh attempt.
+  async function changeCurrentNumber() {
+    if (!CURRENT_ORDER?.id || smsCodeReceived) return;
+    if (!window.confirm('استبدال الرقم يتطلب إلغاء الحجز الحالي لدى المورد. هل تريد المتابعة؟')) return;
+    try {
+      const r = await fetch(`/api/v1/orders/${encodeURIComponent(CURRENT_ORDER.id)}/cancel`, { method: 'POST' });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.detail || 'تعذّر إلغاء الحجز');
+      try { sessionStorage.removeItem('ramzon_active_order'); } catch (_) {}
+      closeModal('smsCodeModal');
+      closeModal('purchaseResultModal');
+      CURRENT_ORDER = null;
+      verifiedVoucher = null;
+      const checkout = document.getElementById('confirm-step');
+      if (checkout) checkout.scrollIntoView({behavior:'smooth', block:'center'});
+      showAlert('تم إلغاء الحجز. تحقّق من الكود مجددًا ثم اختر رقمًا آخر.', 'success');
+    } catch (error) {
+      showAlert('لا يمكن استبدال الرقم حتى يؤكد المورد إلغاء الحجز: ' + error.message, 'error');
+    }
   }
 
   // تنظيف عند إغلاق النافذة
@@ -1755,7 +1918,24 @@
   }
 
   // Init
+  async function restoreActiveOrderAfterRefresh() {
+    let pending = null;
+    try { pending = JSON.parse(sessionStorage.getItem('ramzon_active_order') || 'null'); } catch (_) {}
+    if (!pending?.id) return;
+    try {
+      const response = await fetch(`/api/v1/orders/${encodeURIComponent(pending.id)}/check`, {credentials:'same-origin', cache:'no-store'});
+      if (!response.ok) return;
+      const data = await response.json();
+      if (['CANCELED','CANCELLED','REFUNDED','BANNED'].includes(data.status)) {
+        sessionStorage.removeItem('ramzon_active_order'); return;
+      }
+      CURRENT_ORDER = {...pending, ...data};
+      openSmsModal(CURRENT_ORDER.phone || '');
+    } catch (_) { /* temporary network failure: keep session for next refresh */ }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
+    restoreActiveOrderAfterRefresh();
     document.querySelectorAll('[data-popular-item]').forEach((el,i) => el.dataset.popularIndex = i);
     hydrateServiceIcons(document);
     hydrateCountryFlags();
